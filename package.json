@@ -1,0 +1,51 @@
+{
+  "name": "fit5032-week1",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/",
+    "import-stores": "node scripts/import-stores-data.js"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
+    "@fullcalendar/vue3": "^6.1.19",
+    "@google-cloud/storage": "^7.17.2",
+    "@google/generative-ai": "^0.24.1",
+    "@mapbox/mapbox-gl-directions": "^4.3.1",
+    "@primevue/themes": "^4.3.7",
+    "axios": "^1.12.2",
+    "bootstrap": "^5.3.7",
+    "bootstrap-icons": "^1.13.1",
+    "chart.js": "^4.5.0",
+    "file-saver": "^2.0.5",
+    "firebase": "^12.3.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
+    "mapbox-gl": "^3.15.0",
+    "primevue": "^4.3.7",
+    "vue": "^3.5.17",
+    "vue-chartjs": "^5.3.2",
+    "vue-router": "^4.5.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-vue": "~10.2.0",
+    "globals": "^16.2.0",
+    "prettier": "3.5.3",
+    "vite": "^7.0.0",
+    "vite-plugin-vue-devtools": "^7.7.7"
+  }
+}
