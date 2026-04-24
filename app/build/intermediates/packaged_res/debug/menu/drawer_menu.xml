@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Main Group - Excludes items already in bottom nav (Home, Recipes, Favorites, Profile) -->
+    <group android:id="@+id/group_main">
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_map"
+            android:title="@string/nav_map" />
+
+        <item
+            android:id="@+id/nav_ai_assistant"
+            android:icon="@drawable/ic_smart_toy"
+            android:title="@string/nav_ai_assistant" />
+    </group>
+
+    <!-- Tools Group -->
+    <group android:id="@+id/group_tools">
+        <item
+            android:id="@+id/nav_charts"
+            android:icon="@drawable/ic_bar_chart"
+            android:title="@string/nav_charts" />
+
+        <item
+            android:id="@+id/nav_email"
+            android:icon="@drawable/ic_email"
+            android:title="@string/nav_email" />
+    </group>
+
+    <!-- Admin Group -->
+    <group
+        android:id="@+id/group_admin"
+        android:visible="false">
+        <item
+            android:id="@+id/nav_admin"
+            android:icon="@drawable/ic_admin_panel"
+            android:title="@string/nav_admin" />
+    </group>
+
+    <!-- Account Group - Excludes Profile (already in bottom nav) -->
+    <group android:id="@+id/group_account">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/nav_settings" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/nav_logout" />
+    </group>
+
+</menu>

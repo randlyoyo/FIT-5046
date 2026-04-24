@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Healthy Recipe Hub</string>
-    <string name="title_activity_main">Healthy Recipe Hub</string>
-    <string name="package_name">edu.monash.fit5046.healthrecipehub</string>
-    <string name="custom_url_scheme">edu.monash.fit5046.healthrecipehub</string>
-</resources>

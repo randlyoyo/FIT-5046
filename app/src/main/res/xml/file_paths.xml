@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   File paths for FileProvider
+   Defines which directories can be shared with other apps
+-->
+<paths>
+    <!-- External storage directory -->
+    <external-path
+        name="external_files"
+        path="." />
+    
+    <!-- App-specific external storage -->
+    <external-files-path
+        name="app_external_files"
+        path="." />
+    
+    <!-- Cache directory -->
+    <cache-path
+        name="cache_files"
+        path="." />
+    
+    <!-- Files directory -->
+    <files-path
+        name="internal_files"
+        path="." />
+    
+    <!-- Pictures directory -->
+    <external-path
+        name="pictures"
+        path="Pictures/" />
+    
+    <!-- DCIM directory for camera images -->
+    <external-path
+        name="dcim"
+        path="DCIM/" />
+</paths>

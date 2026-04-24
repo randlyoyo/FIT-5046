@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#FF9800</color>
+    <color name="background">#FAFAFA</color>
+    <color name="black">#000000</color>
+    <color name="calories">#FF5722</color>
+    <color name="carbs">#FFC107</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="category_breakfast">#FF9800</color>
+    <color name="category_dessert">#E91E63</color>
+    <color name="category_dinner">#2196F3</color>
+    <color name="category_lunch">#4CAF50</color>
+    <color name="category_snack">#9C27B0</color>
+    <color name="dark_background">#121212</color>
+    <color name="dark_card">#2D2D2D</color>
+    <color name="dark_surface">#1E1E1E</color>
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#B3B3B3</color>
+    <color name="difficulty_easy">#4CAF50</color>
+    <color name="difficulty_hard">#F44336</color>
+    <color name="difficulty_medium">#FFC107</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="divider_light">#F5F5F5</color>
+    <color name="error">#F44336</color>
+    <color name="fat">#9C27B0</color>
+    <color name="fiber">#4CAF50</color>
+    <color name="info">#2196F3</color>
+    <color name="primary">#4CAF50</color>
+    <color name="primary_dark">#388E3C</color>
+    <color name="primary_light">#C8E6C9</color>
+    <color name="protein">#2196F3</color>
+    <color name="ripple">#1F000000</color>
+    <color name="scrim">#99000000</color>
+    <color name="secondary">#8BC34A</color>
+    <color name="secondary_dark">#689F38</color>
+    <color name="success">#4CAF50</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_secondary">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="warning">#FFC107</color>
+    <color name="white">#FFFFFF</color>
+    <string name="about">About</string>
+    <string name="accessibility_close_menu">Close navigation menu</string>
+    <string name="accessibility_favorite">Favorite button</string>
+    <string name="accessibility_navigate_back">Navigate back</string>
+    <string name="accessibility_open_menu">Open navigation menu</string>
+    <string name="accessibility_recipe_image">Recipe image</string>
+    <string name="accessibility_share">Share button</string>
+    <string name="activity_logs">Activity Logs</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="add_to_log">Add to Nutrition Log</string>
+    <string name="admin_dashboard">Admin Dashboard</string>
+    <string name="ai_placeholder">Ask about recipes, nutrition, or health tips…</string>
+    <string name="ai_send">Send</string>
+    <string name="ai_welcome">Hello! I\'m your nutrition assistant. How can I help you today?</string>
+    <string name="allergies">Allergies</string>
+    <string name="app_name">Healthy Recipe Hub</string>
+    <string name="apply">Apply</string>
+    <string name="approve">Approve</string>
+    <string name="author">Author</string>
+    <string name="biometric_login">Biometric Login</string>
+    <string name="bottom_add">Add</string>
+    <string name="bottom_favorites">Favorites</string>
+    <string name="bottom_home">Home</string>
+    <string name="bottom_profile">Me</string>
+    <string name="bottom_recipes">Recipes</string>
+    <string name="call">Call</string>
+    <string name="calories">Calories</string>
+    <string name="cancel">Cancel</string>
+    <string name="carbs">Carbs</string>
+    <string name="category">Category</string>
+    <string name="category_breakfast">Breakfast</string>
+    <string name="category_dessert">Dessert</string>
+    <string name="category_dinner">Dinner</string>
+    <string name="category_lunch">Lunch</string>
+    <string name="category_snack">Snack</string>
+    <string name="change_password">Change Password</string>
+    <string name="clear">Clear</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="cook_time">Cook Time</string>
+    <string name="cuisine">Cuisine</string>
+    <string name="current_password">Current Password</string>
+    <string name="daily_calorie_goal">Daily Calorie Goal</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="delete">Delete</string>
+    <string name="dietary_preferences">Dietary Preferences</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="directions">Directions</string>
+    <string name="disable">Disable</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="display_name">Display Name</string>
+    <string name="edit">Edit</string>
+    <string name="email">Email</string>
+    <string name="enable">Enable</string>
+    <string name="fat">Fat</string>
+    <string name="fiber">Fiber</string>
+    <string name="filter">Filter</string>
+    <string name="find_stores">Find Stores</string>
+    <string name="font_size">Font Size</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="gcm_defaultSenderId" translatable="false">123456789</string>
+    <string name="google_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
+    <string name="google_app_id" translatable="false">1:123456789:android:abc123def457</string>
+    <string name="google_crash_reporting_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
+    <string name="google_storage_bucket" translatable="false">healthyrecipehub-demo.appspot.com</string>
+    <string name="has_account">Already have an account? Login</string>
+    <string name="high_contrast">High Contrast</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="instructions">Instructions</string>
+    <string name="language">Language</string>
+    <string name="loading">Loading…</string>
+    <string name="login">Login</string>
+    <string name="login_error">Invalid email or password</string>
+    <string name="map_title">Health Food Stores</string>
+    <string name="my_profile">My Profile</string>
+    <string name="my_recipes">My Recipes</string>
+    <string name="nav_admin">Admin Dashboard</string>
+    <string name="nav_ai_assistant">AI Assistant</string>
+    <string name="nav_charts">Statistics</string>
+    <string name="nav_email">Email Center</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_logout">Logout</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_recipes">Recipes</string>
+    <string name="nav_settings">Settings</string>
+    <string name="new_password">New Password</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="no_results">No results found</string>
+    <string name="no_reviews">No reviews yet</string>
+    <string name="notifications">Notifications</string>
+    <string name="nutrition_goals">Nutrition Goals</string>
+    <string name="nutrition_info">Nutrition Information</string>
+    <string name="password">Password</string>
+    <string name="pending_approval">Pending Approval</string>
+    <string name="prep_time">Prep Time</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="project_id" translatable="false">healthyrecipehub-demo</string>
+    <string name="protein">Protein</string>
+    <string name="recipe_approval">Recipe Approval</string>
+    <string name="recipe_description">Description</string>
+    <string name="recipe_title">Recipe Title</string>
+    <string name="register">Register</string>
+    <string name="register_error">Registration failed</string>
+    <string name="reject">Reject</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="retry">Retry</string>
+    <string name="reviews">Reviews</string>
+    <string name="save">Save</string>
+    <string name="search">Search</string>
+    <string name="servings">Servings</string>
+    <string name="settings">Settings</string>
+    <string name="share">Share</string>
+    <string name="share_recipe">Share Recipe</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="sort">Sort</string>
+    <string name="statistics">Statistics</string>
+    <string name="store_details">Store Details</string>
+    <string name="suggested_questions">Suggested Questions</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="title_activity_main">Healthy Recipe Hub</string>
+    <string name="total_recipes">Total Recipes</string>
+    <string name="total_users">Total Users</string>
+    <string name="user_management">User Management</string>
+    <string name="version">Version</string>
+    <string name="website">Website</string>
+    <string name="write_review">Write a Review</string>
+    <style name="Theme.HealthyRecipeHub" parent="Theme.Material3.Light.NoActionBar">
+        
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+
+        
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_dark</item>
+        <item name="colorOnSecondary">@color/text_on_secondary</item>
+
+        
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+        
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorError">@color/error</item>
+
+        
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnError">@color/text_on_primary</item>
+
+        
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Material3.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Material3.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Material3.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Material3.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Material3.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Material3.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Material3.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Material3.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Material3.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Material3.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Material3.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Material3.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Material3.LabelSmall</item>
+
+        
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Material3.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Material3.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Material3.LargeComponent</item>
+
+        
+        <item name="materialButtonStyle">@style/Widget.HealthyRecipeHub.Button</item>
+        <item name="materialCardViewStyle">@style/Widget.HealthyRecipeHub.CardView</item>
+        <item name="textInputStyle">@style/Widget.HealthyRecipeHub.TextInputLayout</item>
+        <item name="bottomNavigationStyle">@style/Widget.HealthyRecipeHub.BottomNavigation</item>
+    </style>
+    <style name="Theme.HealthyRecipeHub.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar">
+        <item name="android:textColorPrimary">@color/text_on_primary</item>
+    </style>
+    <style name="Theme.HealthyRecipeHub.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="android:statusBarColor">@color/dark_surface</item>
+    </style>
+    <style name="Theme.HealthyRecipeHub.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.HealthyRecipeHub.PopupOverlay" parent="ThemeOverlay.Material3.Light">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+    <style name="Theme.HealthyRecipeHub.Splash" parent="Theme.HealthyRecipeHub.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/primary</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemRippleColor">@color/primary_light</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.Button" parent="Widget.Material3.Button">
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/primary</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/primary</item>
+    </style>
+    <style name="Widget.HealthyRecipeHub.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextColor">@color/text_on_primary</item>
+        <item name="subtitleTextColor">@color/text_on_primary</item>
+        <item name="android:background">@color/primary</item>
+    </style>
+</resources>

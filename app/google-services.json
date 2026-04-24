@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "123456789",
+    "project_id": "healthyrecipehub-demo",
+    "storage_bucket": "healthyrecipehub-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:abc123def456",
+        "android_client_info": {
+          "package_name": "edu.monash.fit5046.healthyrecipehub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "DEMO_API_KEY_NOT_FOR_PRODUCTION"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:abc123def457",
+        "android_client_info": {
+          "package_name": "edu.monash.fit5046.healthyrecipehub.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "DEMO_API_KEY_NOT_FOR_PRODUCTION"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
