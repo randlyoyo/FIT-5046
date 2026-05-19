@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Bar Overlay -->
+    <style name="Theme.HealthyRecipeHub.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar">
+        <item name="android:textColorPrimary">@color/text_on_primary</item>
+    </style>
+
+    <!-- Popup Overlay -->
+    <style name="Theme.HealthyRecipeHub.PopupOverlay" parent="ThemeOverlay.Material3.Light">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+</resources>

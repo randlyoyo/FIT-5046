@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Healthy Recipe Hub</string>
+    <string name="title_activity_main">Healthy Recipe Hub</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_recipes">Recipes</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_ai_assistant">AI Assistant</string>
+    <string name="nav_charts">Statistics</string>
+    <string name="nav_admin">Admin Dashboard</string>
+    <string name="nav_email">Email Center</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_logout">Logout</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_home">Home</string>
+    <string name="bottom_recipes">Recipes</string>
+    <string name="bottom_add">Add</string>
+    <string name="bottom_favorites">Favorites</string>
+    <string name="bottom_profile">Me</string>
+
+    <!-- Authentication -->
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="display_name">Display Name</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+    <string name="has_account">Already have an account? Login</string>
+    <string name="biometric_login">Biometric Login</string>
+    <string name="login_error">Invalid email or password</string>
+    <string name="register_error">Registration failed</string>
+
+    <!-- Recipe -->
+    <string name="recipe_title">Recipe Title</string>
+    <string name="recipe_description">Description</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="instructions">Instructions</string>
+    <string name="nutrition_info">Nutrition Information</string>
+    <string name="calories">Calories</string>
+    <string name="protein">Protein</string>
+    <string name="carbs">Carbs</string>
+    <string name="fat">Fat</string>
+    <string name="fiber">Fiber</string>
+    <string name="prep_time">Prep Time</string>
+    <string name="cook_time">Cook Time</string>
+    <string name="servings">Servings</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="category">Category</string>
+    <string name="cuisine">Cuisine</string>
+    <string name="author">Author</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="share_recipe">Share Recipe</string>
+    <string name="add_to_log">Add to Nutrition Log</string>
+    <string name="write_review">Write a Review</string>
+    <string name="reviews">Reviews</string>
+    <string name="no_reviews">No reviews yet</string>
+
+    <!-- Categories -->
+    <string name="category_breakfast">Breakfast</string>
+    <string name="category_lunch">Lunch</string>
+    <string name="category_dinner">Dinner</string>
+    <string name="category_snack">Snack</string>
+    <string name="category_dessert">Dessert</string>
+
+    <!-- Difficulty -->
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_hard">Hard</string>
+
+    <!-- Actions -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="share">Share</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="sort">Sort</string>
+    <string name="apply">Apply</string>
+    <string name="clear">Clear</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading…</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="no_results">No results found</string>
+
+    <!-- AI Assistant -->
+    <string name="ai_welcome">Hello! I\'m your nutrition assistant. How can I help you today?</string>
+    <string name="ai_placeholder">Ask about recipes, nutrition, or health tips…</string>
+    <string name="ai_send">Send</string>
+    <string name="suggested_questions">Suggested Questions</string>
+
+    <!-- Map -->
+    <string name="map_title">Health Food Stores</string>
+    <string name="find_stores">Find Stores</string>
+    <string name="store_details">Store Details</string>
+    <string name="directions">Directions</string>
+    <string name="call">Call</string>
+    <string name="website">Website</string>
+
+    <!-- Admin -->
+    <string name="admin_dashboard">Admin Dashboard</string>
+    <string name="user_management">User Management</string>
+    <string name="recipe_approval">Recipe Approval</string>
+    <string name="statistics">Statistics</string>
+    <string name="activity_logs">Activity Logs</string>
+    <string name="total_users">Total Users</string>
+    <string name="total_recipes">Total Recipes</string>
+    <string name="pending_approval">Pending Approval</string>
+    <string name="approve">Approve</string>
+    <string name="reject">Reject</string>
+    <string name="disable">Disable</string>
+    <string name="enable">Enable</string>
+
+    <!-- Profile -->
+    <string name="my_profile">My Profile</string>
+    <string name="my_recipes">My Recipes</string>
+    <string name="nutrition_goals">Nutrition Goals</string>
+    <string name="dietary_preferences">Dietary Preferences</string>
+    <string name="allergies">Allergies</string>
+    <string name="daily_calorie_goal">Daily Calorie Goal</string>
+    <string name="change_password">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="font_size">Font Size</string>
+    <string name="high_contrast">High Contrast</string>
+    <string name="notifications">Notifications</string>
+    <string name="language">Language</string>
+    <string name="about">About</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="version">Version</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_recipe_image">Recipe image</string>
+    <string name="accessibility_favorite">Favorite button</string>
+    <string name="accessibility_share">Share button</string>
+    <string name="accessibility_navigate_back">Navigate back</string>
+    <string name="accessibility_open_menu">Open navigation menu</string>
+    <string name="accessibility_close_menu">Close navigation menu</string>
+</resources>
