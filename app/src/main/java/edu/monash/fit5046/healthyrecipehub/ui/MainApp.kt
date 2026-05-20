@@ -170,7 +170,10 @@ fun MainApp(
                     composable(Screen.Profile.route) {
                         ProfileScreen(
                             onNavigateBack = { navController.navigateUp() },
-                            user = currentUser
+                            user = currentUser,
+                            onOpenDrawer = {
+                                scope.launch { drawerState.open() }
+                            }
                         )
                     }
                     
