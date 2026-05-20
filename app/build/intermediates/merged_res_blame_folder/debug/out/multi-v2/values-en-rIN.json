@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "edu.monash.fit5046.healthyrecipehub.app-mergeDebugResources-103:/values-en-rIN/values-en-rIN.xml",
+            "outputFile": "edu.monash.fit5046.healthyrecipehub.app-mergeDebugResources-105:/values-en-rIN/values-en-rIN.xml",
             "map": [
                 {
                     "source": "C:\\Users\\wangd\\.gradle\\caches\\transforms-3\\156285630cba726fab5645f581c96d60\\transformed\\foundation-release\\res\\values-en-rIN\\values-en-rIN.xml",

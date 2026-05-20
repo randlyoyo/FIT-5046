@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "edu.monash.fit5046.healthyrecipehub.app-mergeDebugResources-103:/values-it/values-it.xml",
+            "outputFile": "edu.monash.fit5046.healthyrecipehub.app-mergeDebugResources-105:/values-it/values-it.xml",
             "map": [
                 {
                     "source": "C:\\Users\\wangd\\.gradle\\caches\\transforms-3\\4fd9a7f2a3f573e8058d3db557bdaea5\\transformed\\preference-1.2.1\\res\\values-it\\values-it.xml",

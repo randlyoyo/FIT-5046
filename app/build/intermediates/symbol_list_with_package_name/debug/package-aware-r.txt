@@ -3628,6 +3628,7 @@ id clip_horizontal
 id clip_vertical
 id clockwise
 id closest
+id coil_request_manager
 id collapseActionView
 id compose_view_saveable_id_tag
 id compress
@@ -4423,6 +4424,7 @@ string dark_mode
 string default_error_message
 string default_error_msg
 string default_popup_window_title
+string default_web_client_id
 string delete
 string dest_title
 string dietary_preferences

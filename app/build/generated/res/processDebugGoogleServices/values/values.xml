@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="gcm_defaultSenderId" translatable="false">123456789</string>
-    <string name="google_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
-    <string name="google_app_id" translatable="false">1:123456789:android:abc123def457</string>
-    <string name="google_crash_reporting_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
-    <string name="google_storage_bucket" translatable="false">healthyrecipehub-demo.appspot.com</string>
-    <string name="project_id" translatable="false">healthyrecipehub-demo</string>
+    <string name="default_web_client_id" translatable="false">204228945450-ivsg1vqui42aqctfkfujr3pjc3e8ms5h.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">204228945450</string>
+    <string name="google_api_key" translatable="false">AIzaSyDO6DG_CAAYnjVXtCIl9YRbF0WSkxtvW6Y</string>
+    <string name="google_app_id" translatable="false">1:204228945450:android:1e53ed29bb415293b58553</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDO6DG_CAAYnjVXtCIl9YRbF0WSkxtvW6Y</string>
+    <string name="google_storage_bucket" translatable="false">healthyrecipehub-94e93.firebasestorage.app</string>
+    <string name="project_id" translatable="false">healthyrecipehub-94e93</string>
 </resources>

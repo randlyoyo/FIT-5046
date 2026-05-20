@@ -157,6 +157,7 @@ string cuisine
 string current_password
 string daily_calorie_goal
 string dark_mode
+string default_web_client_id
 string delete
 string dietary_preferences
 string difficulty

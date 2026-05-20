@@ -86,6 +86,7 @@
     <string name="current_password">Current Password</string>
     <string name="daily_calorie_goal">Daily Calorie Goal</string>
     <string name="dark_mode">Dark Mode</string>
+    <string name="default_web_client_id" translatable="false">204228945450-ivsg1vqui42aqctfkfujr3pjc3e8ms5h.apps.googleusercontent.com</string>
     <string name="delete">Delete</string>
     <string name="dietary_preferences">Dietary Preferences</string>
     <string name="difficulty">Difficulty</string>
@@ -105,11 +106,11 @@
     <string name="find_stores">Find Stores</string>
     <string name="font_size">Font Size</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="gcm_defaultSenderId" translatable="false">123456789</string>
-    <string name="google_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
-    <string name="google_app_id" translatable="false">1:123456789:android:abc123def457</string>
-    <string name="google_crash_reporting_api_key" translatable="false">DEMO_API_KEY_NOT_FOR_PRODUCTION</string>
-    <string name="google_storage_bucket" translatable="false">healthyrecipehub-demo.appspot.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">204228945450</string>
+    <string name="google_api_key" translatable="false">AIzaSyDO6DG_CAAYnjVXtCIl9YRbF0WSkxtvW6Y</string>
+    <string name="google_app_id" translatable="false">1:204228945450:android:1e53ed29bb415293b58553</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDO6DG_CAAYnjVXtCIl9YRbF0WSkxtvW6Y</string>
+    <string name="google_storage_bucket" translatable="false">healthyrecipehub-94e93.firebasestorage.app</string>
     <string name="has_account">Already have an account? Login</string>
     <string name="high_contrast">High Contrast</string>
     <string name="ingredients">Ingredients</string>
@@ -144,7 +145,7 @@
     <string name="pending_approval">Pending Approval</string>
     <string name="prep_time">Prep Time</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="project_id" translatable="false">healthyrecipehub-demo</string>
+    <string name="project_id" translatable="false">healthyrecipehub-94e93</string>
     <string name="protein">Protein</string>
     <string name="recipe_approval">Recipe Approval</string>
     <string name="recipe_description">Description</string>
