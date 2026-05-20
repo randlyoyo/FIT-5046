@@ -1,0 +1,20 @@
+<navigation
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:id="@+id/mobile_navigation"
+app:startDestination="@+id/nav_home" >
+
+<!-- Placeholder destinations - will be implemented later -->
+<fragment
+    android:id="@+id/nav_home"
+    android:name="androidx.fragment.app.Fragment"
+    android:label="@string/nav_home" />
+<fragment
+    android:id="@+id/nav_recipes"
+    android:name="androidx.fragment.app.Fragment"
+    android:label="@string/nav_recipes" />
+<fragment
+    android:id="@+id/nav_favorites"
+    android:name="androidx.fragment.app.Fragment"
+    android:label="@string/nav_favorites" />
+</navigation>

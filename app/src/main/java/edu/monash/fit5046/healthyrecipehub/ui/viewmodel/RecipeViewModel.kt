@@ -77,16 +77,12 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun loadRecipeById(recipeId: String) {
         viewModelScope.launch {
             _currentRecipe.value = Resource.loading()
-
-            val result = recipeRepository.fetchRecipeById(recipeId)
-            when (result) {
-                is Result.Success -> {
-                    _currentRecipe.value = Resource.success(result.data)
-                }
-                is Result.Error -> {
-                    _currentRecipe.value = Resource.error(result.message)
-                }
-                else -> { /* Do nothing */ }
+            // Load from local Room database first
+            val localRecipe = recipeRepository.getRecipeById(recipeId)
+            if (localRecipe != null) {
+                _currentRecipe.value = Resource.success(localRecipe)
+            } else {
+                _currentRecipe.value = Resource.error("Recipe not found")
             }
         }
     }
@@ -290,6 +286,17 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
             ).collect { recipes ->
                 _recipes.value = Resource.success(recipes)
             }
+        }
+    }
+
+    /**
+     * Toggle favorite status locally (Room + Firestore)
+     */
+    fun toggleFavorite(recipeId: String, isFavorite: Boolean) {
+        viewModelScope.launch {
+            recipeRepository.updateFavoriteStatus(recipeId, isFavorite)
+            loadRecipes()
+            loadFavorites()
         }
     }
 

@@ -1,45 +1,44 @@
 {
   "project_info": {
-    "project_number": "123456789",
-    "project_id": "healthyrecipehub-demo",
-    "storage_bucket": "healthyrecipehub-demo.appspot.com"
+    "project_number": "204228945450",
+    "project_id": "healthyrecipehub-94e93",
+    "storage_bucket": "healthyrecipehub-94e93.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789:android:abc123def456",
+        "mobilesdk_app_id": "1:204228945450:android:1e53ed29bb415293b58553",
         "android_client_info": {
           "package_name": "edu.monash.fit5046.healthyrecipehub"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "204228945450-rfgqkosv5q42i44puseil7rlbfejio0v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.monash.fit5046.healthyrecipehub",
+            "certificate_hash": "ee469eccf38f74e461e3b797210ff93091ef1701"
+          }
+        },
+        {
+          "client_id": "204228945450-ivsg1vqui42aqctfkfujr3pjc3e8ms5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "DEMO_API_KEY_NOT_FOR_PRODUCTION"
+          "current_key": "AIzaSyDO6DG_CAAYnjVXtCIl9YRbF0WSkxtvW6Y"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:123456789:android:abc123def457",
-        "android_client_info": {
-          "package_name": "edu.monash.fit5046.healthyrecipehub.debug"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "DEMO_API_KEY_NOT_FOR_PRODUCTION"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "204228945450-ivsg1vqui42aqctfkfujr3pjc3e8ms5h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
