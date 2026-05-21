@@ -1,5 +1,6 @@
 package edu.monash.fit5046.healthyrecipehub.ui.screens.addrecipe
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import edu.monash.fit5046.healthyrecipehub.data.remote.dto.IngredientDto
@@ -54,10 +56,16 @@ fun AddRecipeScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var selectedDate by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val datePickerState = rememberDatePickerState()
     
     val saveRecipe = saveRecipe@{
         val caloriesValue = calories.toIntOrNull() ?: 0
+
+        if (recipeName.isBlank()) {
+            Toast.makeText(context, "Recipe name cannot be empty", Toast.LENGTH_SHORT).show()
+            return@saveRecipe
+        }
 
         if (recipeName.isBlank() || ingredients.isBlank() || instructions.isBlank()) {
             errorMessage = "Please fill in name, ingredients and instructions"
