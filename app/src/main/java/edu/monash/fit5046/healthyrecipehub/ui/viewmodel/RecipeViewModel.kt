@@ -254,15 +254,14 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteRecipe(recipeId: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = authRepository.getToken()
-
-            if (token != null) {
-                val result = recipeRepository.deleteRecipe(token, recipeId)
-                _operationResult.value = result
-            } else {
+            try {
+                recipeRepository.deleteRecipeById(recipeId)
+                _recipes.value = Resource.success(recipeRepository.getAllRecipes().first())
+                _operationResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
                 _operationResult.value = Result.Error(
-                    Exception("Not authenticated"),
-                    "Please login first"
+                    e,
+                    e.localizedMessage ?: "Failed to delete recipe"
                 )
             }
 

@@ -144,9 +144,14 @@ fun RecipeDetailScreen(
                         IconButton(onClick = { /* Edit */ }) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
-                        IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
+                    IconButton(
+                        onClick = {
+                            recipeViewModel.deleteRecipe(recipeId)
+                            onNavigateBack()
                         }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
                     }
                     IconButton(
                         onClick = {
