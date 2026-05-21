@@ -89,14 +89,14 @@
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
     <string name="retry">Retry</string>
-    <string name="loading">Loading…</string>
+    <string name="loading">Loading...</string>
     <string name="no_internet">No internet connection</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="no_results">No results found</string>
 
     <!-- AI Assistant -->
     <string name="ai_welcome">Hello! I\'m your nutrition assistant. How can I help you today?</string>
-    <string name="ai_placeholder">Ask about recipes, nutrition, or health tips…</string>
+    <string name="ai_placeholder">Ask about recipes, nutrition, or health tips...</string>
     <string name="ai_send">Send</string>
     <string name="suggested_questions">Suggested Questions</string>
 
@@ -107,7 +107,6 @@
     <string name="directions">Directions</string>
     <string name="call">Call</string>
     <string name="website">Website</string>
-
     <!-- Admin -->
     <string name="admin_dashboard">Admin Dashboard</string>
     <string name="user_management">User Management</string>

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,18 @@ plugins {
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.kapt")
 }
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use(::load)
+    }
+}
+
+val mapboxAccessToken = localProperties
+    .getProperty("MAPBOX_ACCESS_TOKEN")
+    ?.takeIf { it.isNotBlank() }
+    ?: "MAPBOX_ACCESS_TOKEN_MISSING"
 
 android {
     namespace = "edu.monash.fit5046.healthyrecipehub"
@@ -18,6 +32,7 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resValue("string", "mapbox_access_token", mapboxAccessToken)
     }
 
     buildTypes {
@@ -137,6 +152,9 @@ dependencies {
 
     // Charts
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // Google ML Kit
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     // Biometric
     implementation("androidx.biometric:biometric:1.1.0")
