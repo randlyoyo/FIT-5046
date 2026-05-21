@@ -33,6 +33,10 @@ fun RecipesScreen(
     onNavigate: (String) -> Unit,
     onOpenDrawer: () -> Unit = {},
     recipes: List<SpoonacularRecipeSummary> = emptyList(),
+    isLoading: Boolean = false,
+    infoMessage: String? = null,
+    isUsingFallbackData: Boolean = false,
+    onRetry: () -> Unit = {},
     onToggleFavorite: (SpoonacularRecipeSummary, Boolean) -> Unit = { _, _ -> },
     favoriteIds: Set<String> = emptySet()
 ) {
@@ -54,6 +58,17 @@ fun RecipesScreen(
         }
     ) { paddingValues ->
         Column(Modifier.fillMaxSize().padding(paddingValues)) {
+            if (isUsingFallbackData && !infoMessage.isNullOrBlank()) {
+                AssistChip(
+                    onClick = onRetry,
+                    label = { Text(infoMessage) },
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 12.dp),
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = Color(0xFFFFF3CD),
+                        labelColor = Color(0xFF6B4F00)
+                    )
+                )
+            }
             Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp)) {
                 OutlinedTextField(
                     value = searchQuery, onValueChange = { searchQuery = it },
@@ -64,9 +79,31 @@ fun RecipesScreen(
                     colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color(0xFFE0E0E0), focusedBorderColor = GreenPrimary)
                 )
             }
-            if (filtered.isEmpty()) {
+            if (isLoading && recipes.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(if (searchQuery.isBlank()) "Loading recipes from Spoonacular..." else "No results", color = Color.Gray, textAlign = TextAlign.Center)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = GreenPrimary)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Loading recipes from Spoonacular...", color = Color.Gray, textAlign = TextAlign.Center)
+                    }
+                }
+            } else if (filtered.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val emptyMessage = when {
+                            searchQuery.isNotBlank() -> "No results"
+                            !infoMessage.isNullOrBlank() -> infoMessage
+                            else -> "No recipes available right now."
+                        }
+                        Text(emptyMessage, color = Color.Gray, textAlign = TextAlign.Center)
+                        Spacer(Modifier.height(12.dp))
+                        OutlinedButton(onClick = onRetry) {
+                            Text("Retry")
+                        }
+                    }
                 }
             } else {
                 LazyVerticalGrid(
@@ -83,6 +120,14 @@ fun RecipesScreen(
                             onToggleFavorite = { onToggleFavorite(recipe, recipe.id.toString() !in favoriteIds) }
                         )
                     }
+                }
+                if (!isUsingFallbackData && !infoMessage.isNullOrBlank()) {
+                    Text(
+                        text = infoMessage,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }

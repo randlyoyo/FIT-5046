@@ -2,6 +2,7 @@ package edu.monash.fit5046.healthyrecipehub.ui.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,10 +10,14 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import edu.monash.fit5046.healthyrecipehub.data.SampleDataProvider
+import edu.monash.fit5046.healthyrecipehub.data.local.database.AppDatabase
 import edu.monash.fit5046.healthyrecipehub.data.model.Recipe
 import edu.monash.fit5046.healthyrecipehub.data.model.Resource
 import edu.monash.fit5046.healthyrecipehub.data.model.Result
 import edu.monash.fit5046.healthyrecipehub.data.model.Ingredient
+import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularNutrient
+import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularNutritionSummary
 import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularApiService
 import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularRecipeSummary
 import kotlinx.coroutines.launch
@@ -20,12 +25,28 @@ import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val TAG = "RecipeViewModel"
+        private const val FALLBACK_MESSAGE = "Showing offline sample recipes because Spoonacular is unavailable."
+    }
+
+    private data class FavoriteNutritionSnapshot(
+        val calories: Int,
+        val protein: Double,
+        val carbs: Double,
+        val fat: Double,
+        val fiber: Double,
+        val category: String,
+        val difficulty: String
+    )
 
     private val firestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val spoon = SpoonacularApiService.getInstance()
     private val apiKey = SpoonacularApiService.API_KEY
+    private val database = AppDatabase.getDatabase(application)
+    private val fallbackRecipeCache = linkedMapOf<String, Recipe>()
 
     private val _recipes = MutableLiveData<Resource<List<SpoonacularRecipeSummary>>>()
     val recipes: LiveData<Resource<List<SpoonacularRecipeSummary>>> = _recipes
@@ -50,11 +71,28 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun loadRecipes() {
         viewModelScope.launch {
             _recipes.value = Resource.loading()
+            if (apiKey.isBlank()) {
+                val fallbackRecipes = loadFallbackRecipeSummaries()
+                Log.w(TAG, "Spoonacular API key missing. Falling back to local recipes.")
+                _recipes.value = Resource.error(FALLBACK_MESSAGE, fallbackRecipes)
+                return@launch
+            }
+
             try {
                 val resp = spoon.searchRecipes(apiKey, "", addInfo = true, addNutrition = true, number = 30)
-                _recipes.value = Resource.success(resp.results ?: emptyList())
+                val results = resp.results.orEmpty()
+                if (results.isNotEmpty()) {
+                    fallbackRecipeCache.clear()
+                    _recipes.value = Resource.success(results)
+                } else {
+                    val fallbackRecipes = loadFallbackRecipeSummaries()
+                    Log.w(TAG, "Spoonacular returned an empty recipe list. Falling back to local recipes.")
+                    _recipes.value = Resource.error(FALLBACK_MESSAGE, fallbackRecipes)
+                }
             } catch (e: Exception) {
-                _recipes.value = Resource.error(e.message ?: "Failed")
+                val fallbackRecipes = loadFallbackRecipeSummaries()
+                Log.e(TAG, "Failed to load Spoonacular recipes. Falling back to local recipes.", e)
+                _recipes.value = Resource.error(FALLBACK_MESSAGE, fallbackRecipes)
             }
         }
     }
@@ -90,6 +128,11 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _currentRecipe.value = Resource.loading()
             try {
+                fallbackRecipeCache[recipeId]?.let { cachedRecipe ->
+                    _currentRecipe.value = Resource.success(cachedRecipe)
+                    return@launch
+                }
+
                 val id = recipeId.toIntOrNull()
                 if (id != null) {
                     val detail = spoon.getRecipeInfo(id, apiKey, includeNutrition = true)
@@ -152,9 +195,31 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                 val snap = firestore.collection("users").document(uid).collection("favorites").get().await()
                 _favorites.value = Resource.success(snap.documents.mapNotNull { doc ->
                     val d = doc.data ?: return@mapNotNull null
-                    Recipe(id = d["id"] as? String ?: doc.id, title = d["title"] as? String ?: "",
-                        description = d["description"] as? String ?: "", imageUrl = d["imageUrl"] as? String,
-                        calories = (d["calories"] as? Long)?.toInt() ?: 0, difficulty = d["difficulty"] as? String ?: "Medium")
+                    val title = d["title"] as? String ?: ""
+                    val snapshot = estimateFavoriteNutrition(
+                        title = title,
+                        category = d["category"] as? String,
+                        difficulty = d["difficulty"] as? String,
+                        calories = (d["calories"] as? Number)?.toInt(),
+                        protein = (d["protein"] as? Number)?.toDouble(),
+                        carbs = (d["carbs"] as? Number)?.toDouble(),
+                        fat = (d["fat"] as? Number)?.toDouble(),
+                        fiber = (d["fiber"] as? Number)?.toDouble()
+                    )
+
+                    Recipe(
+                        id = d["id"] as? String ?: doc.id,
+                        title = title,
+                        description = d["description"] as? String ?: "",
+                        imageUrl = d["imageUrl"] as? String,
+                        calories = snapshot.calories,
+                        protein = snapshot.protein,
+                        carbs = snapshot.carbs,
+                        fat = snapshot.fat,
+                        fiber = snapshot.fiber,
+                        category = snapshot.category,
+                        difficulty = snapshot.difficulty
+                    )
                 })
             } catch (e: Exception) { _favorites.value = Resource.error(e.message ?: "Failed") }
         }
@@ -165,9 +230,33 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
             val uid = auth.currentUser?.uid ?: run { _operationResult.value = Result.Error(Exception("Auth"), "Please login first"); return@launch }
             try {
                 val ref = firestore.collection("users").document(uid).collection("favorites")
-                if (add) ref.document(recipe.id).set(mapOf("id" to recipe.id, "title" to recipe.title,
-                    "imageUrl" to (recipe.imageUrl ?: ""), "calories" to recipe.calories,
-                    "description" to recipe.description, "difficulty" to recipe.difficulty)).await()
+                if (add) {
+                    val snapshot = estimateFavoriteNutrition(
+                        title = recipe.title,
+                        category = recipe.category,
+                        difficulty = recipe.difficulty,
+                        calories = recipe.calories,
+                        protein = recipe.protein,
+                        carbs = recipe.carbs,
+                        fat = recipe.fat,
+                        fiber = recipe.fiber
+                    )
+                    ref.document(recipe.id).set(
+                        mapOf(
+                            "id" to recipe.id,
+                            "title" to recipe.title,
+                            "imageUrl" to (recipe.imageUrl ?: ""),
+                            "description" to recipe.description,
+                            "calories" to snapshot.calories,
+                            "protein" to snapshot.protein,
+                            "carbs" to snapshot.carbs,
+                            "fat" to snapshot.fat,
+                            "fiber" to snapshot.fiber,
+                            "category" to snapshot.category,
+                            "difficulty" to snapshot.difficulty
+                        )
+                    ).await()
+                }
                 else ref.document(recipe.id).delete().await()
                 _operationResult.value = Result.Success(if (add) "Added" else "Removed"); loadFavorites()
             } catch (e: Exception) { _operationResult.value = Result.Error(e, e.message ?: "Failed") }
@@ -194,5 +283,82 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
             } catch (e: Exception) { _operationResult.value = Result.Error(e, e.message ?: "Failed") }
             _isLoading.value = false
         }
+    }
+
+    private suspend fun loadFallbackRecipeSummaries(): List<SpoonacularRecipeSummary> {
+        val localRecipes = runCatching { database.recipeDao().getAllRecipesSync() }
+            .onFailure { Log.e(TAG, "Failed to read fallback recipes from Room.", it) }
+            .getOrDefault(emptyList())
+            .ifEmpty { SampleDataProvider.getSampleRecipes() }
+
+        fallbackRecipeCache.clear()
+        return localRecipes.mapIndexed { index, recipe ->
+            val fallbackId = -1000 - index
+            fallbackRecipeCache[fallbackId.toString()] = recipe.copy(id = fallbackId.toString())
+            SpoonacularRecipeSummary(
+                id = fallbackId,
+                title = recipe.title,
+                image = recipe.imageUrl,
+                imageType = null,
+                nutrition = SpoonacularNutritionSummary(
+                    nutrients = listOf(
+                        SpoonacularNutrient(name = "Calories", amount = recipe.calories.toDouble(), unit = "kcal"),
+                        SpoonacularNutrient(name = "Protein", amount = recipe.protein, unit = "g"),
+                        SpoonacularNutrient(name = "Carbohydrates", amount = recipe.carbs, unit = "g"),
+                        SpoonacularNutrient(name = "Fat", amount = recipe.fat, unit = "g")
+                    )
+                )
+            )
+        }
+    }
+
+    private fun estimateFavoriteNutrition(
+        title: String,
+        category: String?,
+        difficulty: String?,
+        calories: Int?,
+        protein: Double?,
+        carbs: Double?,
+        fat: Double?,
+        fiber: Double?
+    ): FavoriteNutritionSnapshot {
+        val titleLower = title.lowercase()
+        val normalizedCategory = category?.takeIf { it.isNotBlank() } ?: when {
+            titleLower.contains("breakfast") || titleLower.contains("oats") || titleLower.contains("toast") || titleLower.contains("parfait") -> "Breakfast"
+            titleLower.contains("dessert") || titleLower.contains("cake") || titleLower.contains("cookie") || titleLower.contains("ice cream") -> "Dessert"
+            titleLower.contains("snack") || titleLower.contains("bite") || titleLower.contains("bar") -> "Snack"
+            titleLower.contains("salad") || titleLower.contains("vegetable") -> "Salad"
+            else -> "Main Course"
+        }
+        val normalizedDifficulty = difficulty?.takeIf { it.isNotBlank() } ?: when {
+            normalizedCategory == "Breakfast" || normalizedCategory == "Snack" || normalizedCategory == "Salad" -> "Easy"
+            titleLower.contains("stew") || titleLower.contains("roast") || titleLower.contains("braised") -> "Hard"
+            else -> "Medium"
+        }
+
+        val fallback = when {
+            titleLower.contains("salad") || titleLower.contains("vegetable") ->
+                FavoriteNutritionSnapshot(260, 10.0, 30.0, 9.0, 8.0, "Salad", "Easy")
+            titleLower.contains("chicken") || titleLower.contains("salmon") || titleLower.contains("beef") ->
+                FavoriteNutritionSnapshot(560, 38.0, 35.0, 22.0, 5.0, "Main Course", "Medium")
+            normalizedCategory == "Breakfast" ->
+                FavoriteNutritionSnapshot(350, 18.0, 42.0, 10.0, 6.0, "Breakfast", "Easy")
+            normalizedCategory == "Snack" ->
+                FavoriteNutritionSnapshot(220, 8.0, 24.0, 9.0, 4.0, "Snack", "Easy")
+            normalizedCategory == "Dessert" ->
+                FavoriteNutritionSnapshot(300, 6.0, 45.0, 12.0, 3.0, "Dessert", "Medium")
+            else ->
+                FavoriteNutritionSnapshot(520, 32.0, 48.0, 18.0, 7.0, "Main Course", "Medium")
+        }
+
+        return FavoriteNutritionSnapshot(
+            calories = calories?.takeIf { it > 0 } ?: fallback.calories,
+            protein = protein?.takeIf { it > 0.0 } ?: fallback.protein,
+            carbs = carbs?.takeIf { it > 0.0 } ?: fallback.carbs,
+            fat = fat?.takeIf { it > 0.0 } ?: fallback.fat,
+            fiber = fiber?.takeIf { it > 0.0 } ?: fallback.fiber,
+            category = normalizedCategory.ifBlank { fallback.category },
+            difficulty = normalizedDifficulty.ifBlank { fallback.difficulty }
+        )
     }
 }

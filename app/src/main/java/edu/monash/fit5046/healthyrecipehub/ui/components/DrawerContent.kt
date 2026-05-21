@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.Divider
@@ -24,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import edu.monash.fit5046.healthyrecipehub.ui.navigation.Screen
 import edu.monash.fit5046.healthyrecipehub.ui.theme.GreenPrimary
 
 sealed class DrawerItem(
@@ -31,16 +36,29 @@ sealed class DrawerItem(
     val title: String,
     val icon: ImageVector
 ) {
-    object Map : DrawerItem("map", "Map", Icons.Default.Map)
-    object AIAssistant : DrawerItem("ai_assistant", "AI Assistant", Icons.Default.SmartToy)
-    object Charts : DrawerItem("charts", "Statistics", Icons.Default.BarChart)
-    object Settings : DrawerItem("settings", "Settings", Icons.Default.Settings)
+    object Home : DrawerItem(Screen.Home.route, "Home", Icons.Default.Home)
+    object Recipes : DrawerItem(Screen.Recipes.route, "Recipes", Icons.Default.RestaurantMenu)
+    object Favorites : DrawerItem(Screen.Favorites.route, "Favorites", Icons.Default.Favorite)
+    object Profile : DrawerItem(Screen.Profile.route, "Profile", Icons.Default.Person)
+    object Map : DrawerItem(Screen.Map.route, "Map", Icons.Default.Map)
+    object AIAssistant : DrawerItem(Screen.AIAssistant.route, "AI Assistant", Icons.Default.SmartToy)
+    object Charts : DrawerItem(Screen.Charts.route, "Statistics", Icons.Default.BarChart)
+    object Settings : DrawerItem(Screen.Settings.route, "Settings", Icons.Default.Settings)
     object Logout : DrawerItem("logout", "Logout", Icons.Default.Logout)
 }
 
-val drawerItems = listOf(
-    DrawerItem.Map, DrawerItem.AIAssistant, DrawerItem.Charts,
-    DrawerItem.Settings, DrawerItem.Logout
+private val primaryDrawerItems = listOf(
+    DrawerItem.Home,
+    DrawerItem.Recipes,
+    DrawerItem.Favorites,
+    DrawerItem.Profile
+)
+
+private val secondaryDrawerItems = listOf(
+    DrawerItem.Map,
+    DrawerItem.AIAssistant,
+    DrawerItem.Charts,
+    DrawerItem.Settings
 )
 
 @Composable
@@ -66,16 +84,14 @@ fun DrawerContent(
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
         Spacer(Modifier.height(8.dp))
 
-        drawerItems.forEach { item ->
+        primaryDrawerItems.forEach { item ->
             NavigationDrawerItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
-                    when (item) {
-                        DrawerItem.Logout -> onNavigate("logout")
-                        else -> { onNavigate(item.route); onCloseDrawer() }
-                    }
+                    onNavigate(item.route)
+                    onCloseDrawer()
                 },
                 modifier = Modifier.padding(horizontal = 12.dp),
                 colors = NavigationDrawerItemDefaults.colors(
@@ -85,5 +101,43 @@ fun DrawerContent(
                 )
             )
         }
+
+        Divider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+        secondaryDrawerItems.forEach { item ->
+            NavigationDrawerItem(
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(item.title) },
+                selected = currentRoute == item.route,
+                onClick = {
+                    onNavigate(item.route)
+                    onCloseDrawer()
+                },
+                modifier = Modifier.padding(horizontal = 12.dp),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = GreenPrimary.copy(alpha = 0.1f),
+                    selectedTextColor = GreenPrimary,
+                    selectedIconColor = GreenPrimary
+                )
+            )
+        }
+
+        Divider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(DrawerItem.Logout.icon, contentDescription = DrawerItem.Logout.title) },
+            label = { Text(DrawerItem.Logout.title) },
+            selected = false,
+            onClick = {
+                onNavigate(DrawerItem.Logout.route)
+                onCloseDrawer()
+            },
+            modifier = Modifier.padding(horizontal = 12.dp),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = GreenPrimary.copy(alpha = 0.1f),
+                selectedTextColor = GreenPrimary,
+                selectedIconColor = GreenPrimary
+            )
+        )
     }
 }
