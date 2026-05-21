@@ -23,7 +23,7 @@ val mapboxAccessToken = localProperties
 val spoonacularApiKey = localProperties
     .getProperty("SPOONACULAR_API_KEY")
     ?.takeIf { it.isNotBlank() }
-    ?: ""
+    ?: "67989404ea39423caf65f2dce67d5218"
 
 android {
     namespace = "edu.monash.fit5046.healthyrecipehub"
