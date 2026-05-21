@@ -151,6 +151,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun addToFavorites(recipeId: String) {
         viewModelScope.launch {
             try {
+                // Added by Yanbin: Room-based favourite handling
                 recipeRepository.updateFavoriteStatus(recipeId, true)
                 _favorites.value = Resource.success(recipeRepository.getFavoriteRecipes().first())
                 _operationResult.value = Result.Success(Unit)
@@ -169,6 +170,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun removeFromFavorites(recipeId: String) {
         viewModelScope.launch {
             try {
+                // Added by Yanbin: Room-based favourite handling
                 recipeRepository.updateFavoriteStatus(recipeId, false)
                 _favorites.value = Resource.success(recipeRepository.getFavoriteRecipes().first())
                 _operationResult.value = Result.Success(Unit)
@@ -188,6 +190,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                // Added by Yanbin: local recipe save flow
                 val now = System.currentTimeMillis()
                 val localRecipe = Recipe(
                     id = "local_$now",
@@ -255,6 +258,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                // Added by Yanbin: local delete action
                 recipeRepository.deleteRecipeById(recipeId)
                 _recipes.value = Resource.success(recipeRepository.getAllRecipes().first())
                 _operationResult.value = Result.Success(Unit)

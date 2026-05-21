@@ -59,6 +59,7 @@ fun AddRecipeScreen(
     val context = LocalContext.current
     val datePickerState = rememberDatePickerState()
     
+    // Added by Yanbin: UI improvement for Add Recipe
     val saveRecipe = saveRecipe@{
         val caloriesValue = calories.toIntOrNull() ?: 0
 

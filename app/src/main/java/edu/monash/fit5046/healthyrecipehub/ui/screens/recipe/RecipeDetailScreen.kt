@@ -147,6 +147,7 @@ fun RecipeDetailScreen(
                     }
                     IconButton(
                         onClick = {
+                            // Added by Yanbin: local delete action
                             recipeViewModel.deleteRecipe(recipeId)
                             onNavigateBack()
                         }
