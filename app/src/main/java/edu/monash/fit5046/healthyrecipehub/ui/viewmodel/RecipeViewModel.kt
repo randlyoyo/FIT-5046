@@ -79,7 +79,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             try {
-                val resp = spoon.searchRecipes(apiKey, "", addInfo = true, addNutrition = true, number = 30)
+                val resp = spoon.searchRecipes(apiKey, "", number = 30)
                 val results = resp.results.orEmpty()
                 if (results.isNotEmpty()) {
                     fallbackRecipeCache.clear()

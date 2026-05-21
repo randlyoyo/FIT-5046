@@ -28,8 +28,8 @@ interface SpoonacularApiService {
         @Query("cuisine") cuisine: String? = null,
         @Query("diet") diet: String? = null,
         @Query("type") type: String? = null,
-        @Query("addRecipeInformation") addInfo: Boolean = true,
-        @Query("addRecipeNutrition") addNutrition: Boolean = true,
+        @Query("addRecipeInformation") addInfo: Boolean = false,
+        @Query("addRecipeNutrition") addNutrition: Boolean = false,
         @Query("number") number: Int = 30,
         @Query("sort") sort: String = "popularity"
     ): SpoonacularSearchResponse
