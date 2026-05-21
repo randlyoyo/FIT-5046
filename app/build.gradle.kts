@@ -18,7 +18,12 @@ val localProperties = Properties().apply {
 val mapboxAccessToken = localProperties
     .getProperty("MAPBOX_ACCESS_TOKEN")
     ?.takeIf { it.isNotBlank() }
-    ?: "MAPBOX_ACCESS_TOKEN_MISSING"
+    ?: ""
+
+val spoonacularApiKey = localProperties
+    .getProperty("SPOONACULAR_API_KEY")
+    ?.takeIf { it.isNotBlank() }
+    ?: ""
 
 android {
     namespace = "edu.monash.fit5046.healthyrecipehub"
@@ -33,6 +38,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue("string", "mapbox_access_token", mapboxAccessToken)
+        buildConfigField("String", "SPOONACULAR_API_KEY", "\"$spoonacularApiKey\"")
     }
 
     buildTypes {
@@ -46,7 +52,6 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
         }
     }
 
@@ -139,6 +144,9 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
 
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
@@ -146,6 +154,7 @@ dependencies {
     // Image Loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     // Mapbox Maps - using v10 which is available on Maven Central
     implementation("com.mapbox.maps:android:10.16.1")

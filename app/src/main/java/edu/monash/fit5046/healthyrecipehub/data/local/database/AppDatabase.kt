@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
         ChatMessage::class,
         AppSettings::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(ListConverter::class, TimestampConverter::class)

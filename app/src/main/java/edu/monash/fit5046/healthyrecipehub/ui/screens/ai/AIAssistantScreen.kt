@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material3.Button
@@ -78,7 +79,8 @@ private data class RecipeDraftPreview(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AIAssistantScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onOpenDrawer: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -156,8 +158,8 @@ fun AIAssistantScreen(
             TopAppBar(
                 title = { Text("AI Assistant") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

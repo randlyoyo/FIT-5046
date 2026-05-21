@@ -24,6 +24,9 @@
     <string name="bottom_favorites">Favorites</string>
     <string name="bottom_profile">Me</string>
 
+    <!-- Google Sign-In Web Client ID - replace with your Firebase Web Client ID -->
+    <string name="default_web_client_id" translatable="false">204228945450-ivsg1vqui42aqctfkfujr3pjc3e8ms5h.apps.googleusercontent.com</string>
+
     <!-- Authentication -->
     <string name="login">Login</string>
     <string name="register">Register</string>

@@ -39,6 +39,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _profileUpdateResult = MutableLiveData<Result<User>>()
     val profileUpdateResult: LiveData<Result<User>> = _profileUpdateResult
 
+    private val _googleSignInResult = MutableLiveData<Result<User>>()
+    val googleSignInResult: LiveData<Result<User>> = _googleSignInResult
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -79,6 +82,19 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _errorMessage.value = result.message
             }
 
+            _isLoading.value = false
+        }
+    }
+
+    /**
+     * Sign in with Google ID token
+     */
+    fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _isLoading.value = true; _errorMessage.value = null
+            val result = authRepository.signInWithGoogle(idToken)
+            _googleSignInResult.value = result
+            if (result is Result.Error) _errorMessage.value = result.message
             _isLoading.value = false
         }
     }
@@ -199,9 +215,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Clear results
      */
+    fun sendEmailVerification() {
+        viewModelScope.launch { authRepository.sendEmailVerification() }
+    }
+
     fun clearResults() {
         _loginResult.value = Result.Idle
         _registerResult.value = Result.Idle
+        _googleSignInResult.value = Result.Idle
         _passwordResetResult.value = Result.Idle
         _changePasswordResult.value = Result.Idle
         _profileUpdateResult.value = Result.Idle

@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
@@ -36,25 +34,13 @@ sealed class DrawerItem(
     object Map : DrawerItem("map", "Map", Icons.Default.Map)
     object AIAssistant : DrawerItem("ai_assistant", "AI Assistant", Icons.Default.SmartToy)
     object Charts : DrawerItem("charts", "Statistics", Icons.Default.BarChart)
-    object Email : DrawerItem("email", "Email Center", Icons.Default.Email)
     object Settings : DrawerItem("settings", "Settings", Icons.Default.Settings)
-    object Admin : DrawerItem("admin", "Admin Panel", Icons.Default.AdminPanelSettings)
     object Logout : DrawerItem("logout", "Logout", Icons.Default.Logout)
 }
 
-val mainDrawerItems = listOf(
-    DrawerItem.Map,
-    DrawerItem.AIAssistant
-)
-
-val toolsDrawerItems = listOf(
-    DrawerItem.Charts,
-    DrawerItem.Email
-)
-
-val accountDrawerItems = listOf(
-    DrawerItem.Settings,
-    DrawerItem.Logout
+val drawerItems = listOf(
+    DrawerItem.Map, DrawerItem.AIAssistant, DrawerItem.Charts,
+    DrawerItem.Settings, DrawerItem.Logout
 )
 
 @Composable
@@ -67,140 +53,29 @@ fun DrawerContent(
     isAdmin: Boolean = false
 ) {
     ModalDrawerSheet {
-        // Header
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
-            Text(
-                text = "Healthy Recipe Hub",
-                style = MaterialTheme.typography.headlineSmall,
-                color = GreenPrimary,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = userName,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = userEmail,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            )
+            Text("Healthy Recipe Hub", style = MaterialTheme.typography.headlineSmall,
+                color = GreenPrimary, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+            Text(userName, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(userEmail, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
         }
-        
+
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Main section
-        Text(
-            text = "Main",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)
-        )
-        
-        mainDrawerItems.forEach { item ->
+        Spacer(Modifier.height(8.dp))
+
+        drawerItems.forEach { item ->
             NavigationDrawerItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
                 label = { Text(item.title) },
                 selected = currentRoute == item.route,
                 onClick = {
-                    onNavigate(item.route)
-                    onCloseDrawer()
-                },
-                modifier = Modifier.padding(horizontal = 12.dp),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = GreenPrimary.copy(alpha = 0.1f),
-                    selectedTextColor = GreenPrimary,
-                    selectedIconColor = GreenPrimary
-                )
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        Divider(modifier = Modifier.padding(horizontal = 16.dp))
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Tools section
-        Text(
-            text = "Tools",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)
-        )
-        
-        toolsDrawerItems.forEach { item ->
-            NavigationDrawerItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    onNavigate(item.route)
-                    onCloseDrawer()
-                },
-                modifier = Modifier.padding(horizontal = 12.dp),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = GreenPrimary.copy(alpha = 0.1f),
-                    selectedTextColor = GreenPrimary,
-                    selectedIconColor = GreenPrimary
-                )
-            )
-        }
-        
-        // Admin section (conditional)
-        if (isAdmin) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Divider(modifier = Modifier.padding(horizontal = 16.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Admin",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)
-            )
-            
-            NavigationDrawerItem(
-                icon = { Icon(DrawerItem.Admin.icon, contentDescription = DrawerItem.Admin.title) },
-                label = { Text(DrawerItem.Admin.title) },
-                selected = currentRoute == DrawerItem.Admin.route,
-                onClick = {
-                    onNavigate(DrawerItem.Admin.route)
-                    onCloseDrawer()
-                },
-                modifier = Modifier.padding(horizontal = 12.dp),
-                colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = GreenPrimary.copy(alpha = 0.1f),
-                    selectedTextColor = GreenPrimary,
-                    selectedIconColor = GreenPrimary
-                )
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        Divider(modifier = Modifier.padding(horizontal = 16.dp))
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Account section
-        Text(
-            text = "Account",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            modifier = Modifier.padding(horizontal = 28.dp, vertical = 8.dp)
-        )
-        
-        accountDrawerItems.forEach { item ->
-            NavigationDrawerItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    onNavigate(item.route)
-                    onCloseDrawer()
+                    when (item) {
+                        DrawerItem.Logout -> onNavigate("logout")
+                        else -> { onNavigate(item.route); onCloseDrawer() }
+                    }
                 },
                 modifier = Modifier.padding(horizontal = 12.dp),
                 colors = NavigationDrawerItemDefaults.colors(

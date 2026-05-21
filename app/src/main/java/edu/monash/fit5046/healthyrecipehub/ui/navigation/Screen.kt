@@ -3,6 +3,7 @@ package edu.monash.fit5046.healthyrecipehub.ui.navigation
 sealed class Screen(val route: String) {
     // Auth
     object Auth : Screen("auth")
+    object ForgotPassword : Screen("forgot_password")
     
     // Main screens
     object Home : Screen("home")
@@ -14,11 +15,9 @@ sealed class Screen(val route: String) {
     object Favorites : Screen("favorites")
     object Profile : Screen("profile")
     
-    // Side drawer screens
+    // Additional screens
     object Map : Screen("map")
-    object AIAssistant : Screen("ai_assistant")
     object Charts : Screen("charts")
-    object Email : Screen("email")
     object Settings : Screen("settings")
-    object Admin : Screen("admin")
+    object AIAssistant : Screen("ai_assistant")
 }

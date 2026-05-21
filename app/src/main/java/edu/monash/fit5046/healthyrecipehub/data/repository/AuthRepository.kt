@@ -3,39 +3,36 @@ package edu.monash.fit5046.healthyrecipehub.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import edu.monash.fit5046.healthyrecipehub.data.local.database.AppDatabase
 import edu.monash.fit5046.healthyrecipehub.data.model.*
-import edu.monash.fit5046.healthyrecipehub.data.remote.api.AuthApiService
-import edu.monash.fit5046.healthyrecipehub.data.remote.api.RetrofitClient
-import edu.monash.fit5046.healthyrecipehub.data.remote.api.safeApiCall
-import edu.monash.fit5046.healthyrecipehub.data.remote.dto.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
 /**
- * Authentication Repository
- * Manages user authentication state and session
+ * Authentication Repository - Uses Firebase Auth + Firestore
  */
 class AuthRepository(
     private val context: Context,
-    private val apiService: AuthApiService,
     private val database: AppDatabase
 ) {
-
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val usersCollection = firestore.collection("users")
 
     companion object {
         private const val PREFS_NAME = "auth_prefs"
-        private const val KEY_TOKEN = "auth_token"
-        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
         private const val KEY_LAST_LOGIN = "last_login"
-
-        // Mock mode for offline testing - set to true for demo without backend
-        private const val MOCK_MODE = true
 
         @Volatile
         private var instance: AuthRepository? = null
@@ -43,339 +40,181 @@ class AuthRepository(
         fun getInstance(context: Context): AuthRepository {
             return instance ?: synchronized(this) {
                 val database = AppDatabase.getDatabase(context)
-                instance = AuthRepository(
-                    context,
-                    RetrofitClient.authApiService,
-                    database
-                )
+                instance = AuthRepository(context, database)
                 instance!!
             }
         }
     }
 
-    // StateFlow for authentication state
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
-
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     init {
-        // Restore session on initialization
-        restoreSession()
-    }
-
-    // ====== Authentication Operations ======
-
-    suspend fun login(email: String, password: String): Result<User> {
-        // Mock mode: bypass API call for offline testing
-        if (MOCK_MODE) {
-            // In mock mode, accept any credentials and create/login a mock user
-            val mockUser = User(
-                id = "mock_${email.hashCode()}",
-                email = email,
-                displayName = email.substringBefore("@"),
-                photoUrl = null,
-                role = UserRole.USER,
-                dietaryPreferences = emptyList(),
-                allergies = emptyList(),
-                dailyCalorieGoal = 2000,
-                createdAt = System.currentTimeMillis(),
-                lastLoginAt = System.currentTimeMillis(),
-                isEmailVerified = true,
-                isBiometricEnabled = false
+        if (firebaseAuth.currentUser != null) {
+            saveSessionId(firebaseAuth.currentUser!!.uid)
+            // Set a valid auth state so MainApp doesn't think we're unauthenticated
+            _authState.value = AuthState.Authenticated(
+                createUserFromFirebaseUser(firebaseAuth.currentUser!!)
             )
-
-            saveAuthData("mock_token_${System.currentTimeMillis()}", mockUser)
-            _currentUser.value = mockUser
-            _authState.value = AuthState.Authenticated(mockUser)
-            database.userDao().insertUser(mockUser)
-
-            return Result.Success(mockUser)
-        }
-
-        val request = LoginRequest(email, password)
-
-        return when (val result = safeApiCall { apiService.login(request) }) {
-            is Result.Success -> {
-                val response = result.data
-                if (response.success && response.user != null) {
-                    val user = response.user.toUser()
-
-                    // Save auth data
-                    saveAuthData(response.token, user)
-
-                    // Update state
-                    _currentUser.value = user
-                    _authState.value = AuthState.Authenticated(user)
-
-                    // Cache user to local database
-                    database.userDao().insertUser(user)
-
-                    // Log activity
-                    logActivity(user.id, ActivityType.LOGIN)
-
-                    Result.Success(user)
-                } else {
-                    Result.Error(
-                        Exception("Login failed"),
-                        response.message ?: "Invalid credentials"
-                    )
-                }
-            }
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
+        } else {
+            clearSession(); _authState.value = AuthState.Unauthenticated
         }
     }
 
-    suspend fun register(email: String, password: String, displayName: String): Result<User> {
-        // Mock mode: bypass API call for offline testing
-        if (MOCK_MODE) {
-            val mockUser = User(
-                id = "mock_${System.currentTimeMillis()}",
-                email = email,
-                displayName = displayName,
-                photoUrl = null,
-                role = UserRole.USER,
-                dietaryPreferences = emptyList(),
-                allergies = emptyList(),
-                dailyCalorieGoal = 2000,
-                createdAt = System.currentTimeMillis(),
-                lastLoginAt = System.currentTimeMillis(),
-                isEmailVerified = true,
-                isBiometricEnabled = false
-            )
+    suspend fun login(email: String, password: String): Result<User> = try {
+        val r = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        val fb = r.user ?: throw Exception("Login failed")
+        val u = (getUserFromFirestore(fb.uid) ?: createUserFromFirebaseUser(fb)).copy(lastLoginAt = System.currentTimeMillis())
+        saveUserToFirestore(u); saveSession(u); database.userDao().insertUser(u)
+        logActivity(u.id, ActivityType.LOGIN)
+        _currentUser.value = u; _authState.value = AuthState.Authenticated(u)
+        Result.Success(u)
+    } catch (e: Exception) { Result.Error(e, e.message ?: "Login failed") }
 
-            saveAuthData("mock_token_${System.currentTimeMillis()}", mockUser)
-            _currentUser.value = mockUser
-            _authState.value = AuthState.Authenticated(mockUser)
-            database.userDao().insertUser(mockUser)
+    suspend fun register(email: String, password: String, displayName: String): Result<User> = try {
+        val r = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+        val fb = r.user ?: throw Exception("Registration failed")
+        fb.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(displayName).build()).await()
+        fb.sendEmailVerification().await()
+        val u = User(id = fb.uid, email = email, displayName = displayName,
+            photoUrl = fb.photoUrl?.toString(), role = UserRole.USER,
+            dietaryPreferences = emptyList(), allergies = emptyList(), dailyCalorieGoal = 2000,
+            createdAt = System.currentTimeMillis(), lastLoginAt = System.currentTimeMillis(),
+            isEmailVerified = false, isBiometricEnabled = false)
+        saveUserToFirestore(u); saveSession(u); database.userDao().insertUser(u)
+        logActivity(u.id, ActivityType.LOGIN)
+        _currentUser.value = u; _authState.value = AuthState.Authenticated(u)
+        Result.Success(u)
+    } catch (e: Exception) { Result.Error(e, e.message ?: "Registration failed") }
 
-            return Result.Success(mockUser)
-        }
-
-        val request = RegisterRequest(email, password, displayName)
-
-        return when (val result = safeApiCall { apiService.register(request) }) {
-            is Result.Success -> {
-                val response = result.data
-                if (response.success && response.user != null) {
-                    val user = response.user.toUser()
-
-                    if (response.requiresEmailVerification) {
-                        _authState.value = AuthState.EmailVerificationRequired(user.email)
-                        Result.Success(user)
-                    } else {
-                        saveAuthData(response.token, user)
-                        _currentUser.value = user
-                        _authState.value = AuthState.Authenticated(user)
-                        database.userDao().insertUser(user)
-                        Result.Success(user)
-                    }
-                } else {
-                    Result.Error(
-                        Exception("Registration failed"),
-                        response.message ?: "Registration failed"
-                    )
-                }
-            }
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
-        }
-    }
+    suspend fun signInWithGoogle(idToken: String): Result<User> = try {
+        val r = firebaseAuth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await()
+        val fb = r.user ?: throw Exception("Google Sign-In failed")
+        val u = (getUserFromFirestore(fb.uid) ?: createUserFromFirebaseUser(fb)).copy(lastLoginAt = System.currentTimeMillis())
+        saveUserToFirestore(u); saveSession(u); database.userDao().insertUser(u)
+        logActivity(u.id, ActivityType.LOGIN)
+        _currentUser.value = u; _authState.value = AuthState.Authenticated(u)
+        Result.Success(u)
+    } catch (e: Exception) { Result.Error(e, e.message ?: "Google Sign-In failed") }
 
     suspend fun logout(): Result<Unit> {
-        val token = getToken()
-
-        // Log activity before logout
-        _currentUser.value?.let {
-            logActivity(it.id, ActivityType.LOGOUT)
-        }
-
-        // Clear local auth data regardless of API result
-        clearAuthData()
-
-        _currentUser.value = null
-        _authState.value = AuthState.Unauthenticated
-
-        // Try to notify server
-        token?.let {
-            safeApiCall { apiService.logout("Bearer $it") }
-        }
-
+        _currentUser.value?.let { logActivity(it.id, ActivityType.LOGOUT) }
+        firebaseAuth.signOut(); clearSession()
+        _currentUser.value = null; _authState.value = AuthState.Unauthenticated
         return Result.Success(Unit)
     }
 
-    suspend fun forgotPassword(email: String): Result<Unit> {
-        val request = PasswordResetRequest(email)
-        return when (val result = safeApiCall { apiService.forgotPassword(request) }) {
-            is Result.Success -> Result.Success(Unit)
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
-        }
-    }
+    suspend fun forgotPassword(email: String): Result<Unit> = try {
+        firebaseAuth.sendPasswordResetEmail(email).await(); Result.Success(Unit)
+    } catch (e: Exception) { Result.Error(e, e.message ?: "Password reset failed") }
 
-    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
-        val token = getToken() ?: return Result.Error(
-            Exception("Not authenticated"),
-            "Please login first"
-        )
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> = try {
+        val u = firebaseAuth.currentUser ?: throw Exception("Not authenticated")
+        u.reauthenticate(com.google.firebase.auth.EmailAuthProvider.getCredential(u.email ?: "", currentPassword)).await()
+        u.updatePassword(newPassword).await()
+        logActivity(u.uid, ActivityType.PASSWORD_CHANGE); Result.Success(Unit)
+    } catch (e: Exception) { Result.Error(e, e.message ?: "Password change failed") }
 
-        val request = ChangePasswordRequest(currentPassword, newPassword)
-        return when (val result = safeApiCall {
-            apiService.changePassword("Bearer $token", request)
-        }) {
-            is Result.Success -> {
-                _currentUser.value?.let {
-                    logActivity(it.id, ActivityType.PASSWORD_CHANGE)
-                }
-                Result.Success(Unit)
-            }
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
-        }
-    }
-
-    // ====== Profile Operations ======
-
-    suspend fun updateProfile(
-        displayName: String? = null,
-        photoUrl: String? = null,
-        dietaryPreferences: List<String>? = null,
-        allergies: List<String>? = null,
-        dailyCalorieGoal: Int? = null
-    ): Result<User> {
-        val token = getToken() ?: return Result.Error(
-            Exception("Not authenticated"),
-            "Please login first"
-        )
-
-        val request = UpdateProfileRequest(
-            displayName = displayName,
-            photoUrl = photoUrl,
-            dietaryPreferences = dietaryPreferences,
-            allergies = allergies,
-            dailyCalorieGoal = dailyCalorieGoal
-        )
-
-        return when (val result = safeApiCall {
-            apiService.updateProfile("Bearer $token", request)
-        }) {
-            is Result.Success -> {
-                val user = result.data.data?.toUser()
-                if (user != null) {
-                    _currentUser.value = user
-                    database.userDao().updateUser(user)
-                    logActivity(user.id, ActivityType.PROFILE_UPDATE)
-                    Result.Success(user)
-                } else {
-                    Result.Error(Exception("Update failed"), "Failed to update profile")
-                }
-            }
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
-        }
+    suspend fun updateProfile(displayName: String? = null, photoUrl: String? = null,
+        dietaryPreferences: List<String>? = null, allergies: List<String>? = null,
+        dailyCalorieGoal: Int? = null): Result<User> {
+        val cu = _currentUser.value ?: return Result.Error(Exception("Not auth"), "Login first")
+        return try {
+            val updated = cu.copy(displayName = displayName ?: cu.displayName,
+                photoUrl = photoUrl ?: cu.photoUrl,
+                dietaryPreferences = dietaryPreferences ?: cu.dietaryPreferences,
+                allergies = allergies ?: cu.allergies,
+                dailyCalorieGoal = dailyCalorieGoal ?: cu.dailyCalorieGoal)
+            if (displayName != null) firebaseAuth.currentUser?.updateProfile(
+                UserProfileChangeRequest.Builder().setDisplayName(displayName).build())?.await()
+            saveUserToFirestore(updated); database.userDao().updateUser(updated)
+            _currentUser.value = updated; logActivity(updated.id, ActivityType.PROFILE_UPDATE)
+            Result.Success(updated)
+        } catch (e: Exception) { Result.Error(e, e.message ?: "Update failed") }
     }
 
     suspend fun refreshUserData(): Result<User> {
-        val token = getToken() ?: return Result.Error(
-            Exception("Not authenticated"),
-            "Please login first"
-        )
-
-        return when (val result = safeApiCall {
-            apiService.getCurrentUser("Bearer $token")
-        }) {
-            is Result.Success -> {
-                val user = result.data.data?.toUser()
-                if (user != null) {
-                    _currentUser.value = user
-                    database.userDao().updateUser(user)
-                    Result.Success(user)
-                } else {
-                    Result.Error(Exception("User not found"), "User data not available")
-                }
-            }
-            is Result.Error -> result
-            is Result.Loading -> Result.Loading
-            is Result.Idle -> Result.Idle
-        }
+        return try {
+            val fb = firebaseAuth.currentUser ?: return Result.Error(Exception("Not auth"), "Login first")
+            val u = getUserFromFirestore(fb.uid) ?: createUserFromFirebaseUser(fb)
+            _currentUser.value = u; database.userDao().insertUser(u)
+            _authState.value = AuthState.Authenticated(u); Result.Success(u)
+        } catch (e: Exception) { Result.Error(e, e.message ?: "Refresh failed") }
     }
 
-    // ====== Session Management ======
-
-    private fun saveAuthData(token: String?, user: User) {
-        prefs.edit {
-            putString(KEY_TOKEN, token)
-            putString(KEY_USER_ID, user.id)
-            putBoolean(KEY_IS_LOGGED_IN, true)
-            putLong(KEY_LAST_LOGIN, System.currentTimeMillis())
-        }
-        RetrofitClient.setAuthToken(token)
+    private suspend fun saveUserToFirestore(user: User) {
+        usersCollection.document(user.id).set(hashMapOf(
+            "id" to user.id, "email" to user.email, "displayName" to user.displayName,
+            "photoUrl" to user.photoUrl, "role" to user.role.name,
+            "dietaryPreferences" to user.dietaryPreferences, "allergies" to user.allergies,
+            "dailyCalorieGoal" to user.dailyCalorieGoal, "createdAt" to user.createdAt,
+            "lastLoginAt" to user.lastLoginAt, "isEmailVerified" to user.isEmailVerified,
+            "isBiometricEnabled" to user.isBiometricEnabled)).await()
     }
 
-    private fun clearAuthData() {
-        prefs.edit {
-            remove(KEY_TOKEN)
-            remove(KEY_REFRESH_TOKEN)
-            remove(KEY_USER_ID)
-            putBoolean(KEY_IS_LOGGED_IN, false)
-        }
-        RetrofitClient.setAuthToken(null)
+    private suspend fun getUserFromFirestore(userId: String): User? = try {
+        val d = usersCollection.document(userId).get().await()
+        if (d.exists()) User(id = d.getString("id") ?: userId, email = d.getString("email") ?: "",
+            displayName = d.getString("displayName") ?: "", photoUrl = d.getString("photoUrl"),
+            role = try { UserRole.valueOf(d.getString("role") ?: "USER") } catch (_: Exception) { UserRole.USER },
+            dietaryPreferences = (d.get("dietaryPreferences") as? List<String>) ?: emptyList(),
+            allergies = (d.get("allergies") as? List<String>) ?: emptyList(),
+            dailyCalorieGoal = (d.getLong("dailyCalorieGoal")?.toInt()) ?: 2000,
+            createdAt = d.getLong("createdAt") ?: System.currentTimeMillis(),
+            lastLoginAt = d.getLong("lastLoginAt") ?: System.currentTimeMillis(),
+            isEmailVerified = d.getBoolean("isEmailVerified") ?: false,
+            isBiometricEnabled = d.getBoolean("isBiometricEnabled") ?: false) else null
+    } catch (_: Exception) { null }
+
+    private fun createUserFromFirebaseUser(fb: com.google.firebase.auth.FirebaseUser) = User(
+        id = fb.uid, email = fb.email ?: "",
+        displayName = fb.displayName ?: fb.email?.substringBefore("@") ?: "User",
+        photoUrl = fb.photoUrl?.toString(), role = UserRole.USER,
+        dietaryPreferences = emptyList(), allergies = emptyList(), dailyCalorieGoal = 2000,
+        createdAt = System.currentTimeMillis(), lastLoginAt = System.currentTimeMillis(),
+        isEmailVerified = fb.isEmailVerified, isBiometricEnabled = false)
+
+    suspend fun sendEmailVerification(): Result<Unit> {
+        return try {
+            firebaseAuth.currentUser?.sendEmailVerification()?.await()
+            Result.Success(Unit)
+        } catch (e: Exception) { Result.Error(e, e.message ?: "Failed") }
     }
 
-    private fun restoreSession() {
-        // In MOCK_MODE, do not restore session - always require fresh login
-        if (MOCK_MODE) {
-            _authState.value = AuthState.Unauthenticated
-            return
-        }
-        val token = prefs.getString(KEY_TOKEN, null)
-        val userId = prefs.getString(KEY_USER_ID, null)
-        val isLoggedIn = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
-
-        if (isLoggedIn && token != null && userId != null) {
-            RetrofitClient.setAuthToken(token)
-        }
-        _authState.value = AuthState.Unauthenticated
+    fun getToken(): String? {
+        return try {
+            val t = firebaseAuth.currentUser?.getIdToken(false) ?: return null
+            Tasks.await(t).token
+        } catch (_: Exception) { null }
     }
+    suspend fun getIdToken(): String? = try {
+        firebaseAuth.currentUser?.getIdToken(false)?.await()?.token
+    } catch (_: Exception) { null }
 
-    fun getToken(): String? = prefs.getString(KEY_TOKEN, null)
+    private fun saveSessionId(userId: String) { prefs.edit {
+        putString(KEY_USER_ID, userId); putBoolean(KEY_IS_LOGGED_IN, true)
+        putLong(KEY_LAST_LOGIN, System.currentTimeMillis()) } }
+    private fun saveSession(user: User) { saveSessionId(user.id) }
+    private fun clearSession() { prefs.edit {
+        remove(KEY_USER_ID); putBoolean(KEY_IS_LOGGED_IN, false) } }
 
     fun getCurrentUserId(): String? = prefs.getString(KEY_USER_ID, null)
 
-    fun isLoggedIn(): Boolean {
-        if (MOCK_MODE) return false
-        return prefs.getBoolean(KEY_IS_LOGGED_IN, false)
-    }
-
+    fun isLoggedIn(): Boolean = firebaseAuth.currentUser != null
     fun isAdmin(): Boolean = _currentUser.value?.role == UserRole.ADMIN
 
-    // ====== Activity Logging ======
-
-    private suspend fun logActivity(userId: String, activityType: ActivityType, details: String? = null) {
-        val log = UserActivityLog(
-            userId = userId,
-            activityType = activityType,
-            details = details
-        )
-        database.userDao().insertActivityLog(log)
+    private suspend fun logActivity(userId: String, type: ActivityType, details: String? = null) {
+        database.userDao().insertActivityLog(UserActivityLog(userId = userId, activityType = type, details = details))
     }
 
     fun getCurrentUserLive(): Flow<User?> {
-        val userId = getCurrentUserId() ?: return MutableStateFlow(null).asStateFlow()
-        return database.userDao().getUserByIdFlow(userId)
+        val uid = getCurrentUserId() ?: return MutableStateFlow(null).asStateFlow()
+        return database.userDao().getUserByIdFlow(uid)
     }
 }
 
-/**
- * Authentication State Sealed Class
- */
 sealed class AuthState {
     data object Unauthenticated : AuthState()
     data object Loading : AuthState()

@@ -1,0 +1,8 @@
+# ====================================
+# Healthy Recipe Hub - API Keys Config
+# ====================================
+# Copy this file to local.properties and fill in the keys
+# (local.properties is gitignored, so your keys stay private)
+
+MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
+SPOONACULAR_API_KEY=your_spoonacular_key_here
