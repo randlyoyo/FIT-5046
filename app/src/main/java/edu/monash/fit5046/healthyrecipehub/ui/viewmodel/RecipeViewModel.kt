@@ -9,7 +9,7 @@ import edu.monash.fit5046.healthyrecipehub.data.model.*
 import edu.monash.fit5046.healthyrecipehub.data.remote.dto.RecipeUploadRequest
 import edu.monash.fit5046.healthyrecipehub.data.repository.AuthRepository
 import edu.monash.fit5046.healthyrecipehub.data.repository.RecipeRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -78,6 +78,12 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _currentRecipe.value = Resource.loading()
 
+            val localRecipe = recipeRepository.getRecipeById(recipeId)
+            if (localRecipe != null) {
+                _currentRecipe.value = Resource.success(localRecipe)
+                return@launch
+            }
+
             val result = recipeRepository.fetchRecipeById(recipeId)
             when (result) {
                 is Result.Success -> {
@@ -144,14 +150,14 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun addToFavorites(recipeId: String) {
         viewModelScope.launch {
-            val token = authRepository.getToken()
-            if (token != null) {
-                val result = recipeRepository.addToFavorites(token, recipeId)
-                _operationResult.value = result
-            } else {
+            try {
+                recipeRepository.updateFavoriteStatus(recipeId, true)
+                _favorites.value = Resource.success(recipeRepository.getFavoriteRecipes().first())
+                _operationResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
                 _operationResult.value = Result.Error(
-                    Exception("Not authenticated"),
-                    "Please login first"
+                    e,
+                    e.localizedMessage ?: "Failed to add favorite"
                 )
             }
         }
@@ -162,14 +168,14 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun removeFromFavorites(recipeId: String) {
         viewModelScope.launch {
-            val token = authRepository.getToken()
-            if (token != null) {
-                val result = recipeRepository.removeFromFavorites(token, recipeId)
-                _operationResult.value = result
-            } else {
+            try {
+                recipeRepository.updateFavoriteStatus(recipeId, false)
+                _favorites.value = Resource.success(recipeRepository.getFavoriteRecipes().first())
+                _operationResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
                 _operationResult.value = Result.Error(
-                    Exception("Not authenticated"),
-                    "Please login first"
+                    e,
+                    e.localizedMessage ?: "Failed to remove favorite"
                 )
             }
         }
@@ -181,15 +187,38 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun createRecipe(recipe: RecipeUploadRequest) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = authRepository.getToken()
+            try {
+                val now = System.currentTimeMillis()
+                val localRecipe = Recipe(
+                    id = "local_$now",
+                    title = recipe.title,
+                    description = recipe.description,
+                    imageUrl = recipe.imageUrl,
+                    calories = recipe.calories,
+                    protein = recipe.protein,
+                    carbs = recipe.carbs,
+                    fat = recipe.fat,
+                    prepTime = recipe.prepTime,
+                    cookTime = recipe.cookTime,
+                    servings = recipe.servings,
+                    difficulty = recipe.difficulty,
+                    category = recipe.category,
+                    cuisine = recipe.cuisine,
+                    dietaryTags = recipe.dietaryTags,
+                    ingredients = recipe.ingredients.map { it.toIngredient() },
+                    instructions = recipe.instructions,
+                    createdAt = now,
+                    updatedAt = now,
+                    isOffline = true
+                )
 
-            if (token != null) {
-                val result = recipeRepository.createRecipe(token, recipe)
-                _operationResult.value = result.map { }
-            } else {
+                recipeRepository.saveRecipe(localRecipe)
+                _recipes.value = Resource.success(recipeRepository.getAllRecipes().first())
+                _operationResult.value = Result.Success(Unit)
+            } catch (e: Exception) {
                 _operationResult.value = Result.Error(
-                    Exception("Not authenticated"),
-                    "Please login first"
+                    e,
+                    e.localizedMessage ?: "Failed to save recipe"
                 )
             }
 

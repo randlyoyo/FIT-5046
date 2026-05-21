@@ -14,10 +14,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import edu.monash.fit5046.healthyrecipehub.ui.components.BottomNavBar
 import edu.monash.fit5046.healthyrecipehub.ui.components.DrawerContent
 import edu.monash.fit5046.healthyrecipehub.ui.navigation.Screen
@@ -29,6 +31,7 @@ import edu.monash.fit5046.healthyrecipehub.ui.screens.favorites.FavoritesScreen
 import edu.monash.fit5046.healthyrecipehub.ui.screens.home.HomeScreen
 import edu.monash.fit5046.healthyrecipehub.ui.screens.map.MapScreen
 import edu.monash.fit5046.healthyrecipehub.ui.screens.profile.ProfileScreen
+import edu.monash.fit5046.healthyrecipehub.ui.screens.recipe.RecipeDetailScreen
 import edu.monash.fit5046.healthyrecipehub.ui.screens.recipes.RecipesScreen
 import edu.monash.fit5046.healthyrecipehub.ui.screens.settings.SettingsScreen
 import edu.monash.fit5046.healthyrecipehub.ui.theme.HealthyRecipeHubTheme
@@ -153,7 +156,21 @@ fun MainApp(
                             },
                             onOpenDrawer = {
                                 scope.launch { drawerState.open() }
-                            }
+                            },
+                            recipeViewModel = recipeViewModel
+                        )
+                    }
+
+                    composable(
+                        route = Screen.RecipeDetail.route,
+                        arguments = listOf(navArgument("recipeId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val recipeId = backStackEntry.arguments?.getString("recipeId") ?: ""
+                        RecipeDetailScreen(
+                            recipeId = recipeId,
+                            onNavigateBack = { navController.navigateUp() },
+                            recipeViewModel = recipeViewModel,
+                            authViewModel = authViewModel
                         )
                     }
                     
@@ -162,6 +179,9 @@ fun MainApp(
                         FavoritesScreen(
                             onOpenDrawer = {
                                 scope.launch { drawerState.open() }
+                            },
+                            onRecipeClick = { recipe ->
+                                navController.navigate(Screen.RecipeDetail.createRoute(recipe.id))
                             },
                             favorites = favoritesResource?.data ?: emptyList()
                         )

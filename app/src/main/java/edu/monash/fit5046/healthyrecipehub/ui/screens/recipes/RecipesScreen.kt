@@ -152,7 +152,7 @@ fun RecipesScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(filteredRecipes) { recipe ->
-                        RecipeCard(recipe = recipe, onClick = { onNavigate("recipe_detail/${recipe.id}") })
+                        RecipeCard(recipe = recipe, onClick = { onNavigate(Screen.RecipeDetail.createRoute(recipe.id)) })
                     }
                 }
             }

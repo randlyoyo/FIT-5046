@@ -36,6 +36,7 @@ import edu.monash.fit5046.healthyrecipehub.data.model.Recipe
 @Composable
 fun FavoritesScreen(
     onOpenDrawer: () -> Unit,
+    onRecipeClick: (Recipe) -> Unit,
     favorites: List<Recipe> = emptyList()
 ) {
     Scaffold(
@@ -87,7 +88,7 @@ fun FavoritesScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(favorites) { recipe ->
-                        FavoriteCard(recipe = recipe)
+                        FavoriteCard(recipe = recipe, onClick = { onRecipeClick(recipe) })
                     }
                 }
             }
@@ -96,8 +97,12 @@ fun FavoritesScreen(
 }
 
 @Composable
-fun FavoriteCard(recipe: Recipe) {
+fun FavoriteCard(
+    recipe: Recipe,
+    onClick: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
