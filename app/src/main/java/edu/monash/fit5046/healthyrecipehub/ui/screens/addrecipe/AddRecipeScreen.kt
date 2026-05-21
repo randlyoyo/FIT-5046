@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import edu.monash.fit5046.healthyrecipehub.data.remote.dto.IngredientDto
 import edu.monash.fit5046.healthyrecipehub.data.remote.dto.RecipeUploadRequest
@@ -96,7 +97,11 @@ fun AddRecipeScreen(
                 },
                 actions = {
                     TextButton(onClick = saveRecipe) {
-                        Text("Save", color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            text = "SAVE",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -126,7 +131,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             item {
                 OutlinedTextField(
@@ -138,7 +143,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             item {
                 OutlinedTextField(
@@ -151,7 +156,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             item {
                 OutlinedTextField(
@@ -164,7 +169,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             item {
                 OutlinedTextField(
@@ -176,7 +181,7 @@ fun AddRecipeScreen(
                 )
             }
 
-            item { Spacer(modifier = Modifier.height(12.dp)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
 
             item {
                 OutlinedTextField(
