@@ -26,7 +26,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import edu.monash.fit5046.healthyrecipehub.data.model.Recipe
+import edu.monash.fit5046.healthyrecipehub.data.model.Status
 import edu.monash.fit5046.healthyrecipehub.data.repository.AuthState
+import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularRecipeSummary
 import edu.monash.fit5046.healthyrecipehub.ui.auth.AuthActivity
 import edu.monash.fit5046.healthyrecipehub.ui.components.BottomNavBar
 import edu.monash.fit5046.healthyrecipehub.ui.components.DrawerContent
@@ -45,6 +47,16 @@ import edu.monash.fit5046.healthyrecipehub.ui.theme.HealthyRecipeHubTheme
 import edu.monash.fit5046.healthyrecipehub.ui.viewmodel.AuthViewModel
 import edu.monash.fit5046.healthyrecipehub.ui.viewmodel.RecipeViewModel
 import kotlinx.coroutines.launch
+
+private data class FavoriteNutrition(
+    val calories: Int,
+    val protein: Double,
+    val carbs: Double,
+    val fat: Double,
+    val fiber: Double,
+    val category: String,
+    val difficulty: String
+)
 
 @Composable
 fun MainApp(
@@ -91,7 +103,9 @@ fun MainApp(
                         when (route) {
                             "logout" -> authViewModel.logout()
                             else -> navController.navigate(route) {
-                                launchSingleTop = true; restoreState = true
+                                popUpTo(Screen.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     },
@@ -144,11 +158,27 @@ fun MainApp(
                         RecipesScreen(
                             onNavigate = { navController.navigate(it) { launchSingleTop = true; restoreState = true } },
                             onOpenDrawer = { scope.launch { drawerState.open() } },
-                            recipes = recipesResource?.data ?: emptyList(),
+                            recipes = recipesResource?.data.orEmpty(),
+                            isLoading = recipesResource?.status == Status.LOADING,
+                            infoMessage = recipesResource?.message,
+                            isUsingFallbackData = recipesResource?.status == Status.ERROR && !recipesResource?.data.isNullOrEmpty(),
+                            onRetry = { recipeViewModel.loadRecipes() },
                             onToggleFavorite = { summary, isFav ->
+                                val nutrition = summary.toFavoriteNutrition()
                                 recipeViewModel.toggleFavorite(
-                                    Recipe(id = summary.id.toString(), title = summary.title,
-                                        description = "", imageUrl = summary.image),
+                                    Recipe(
+                                        id = summary.id.toString(),
+                                        title = summary.title,
+                                        description = "Saved from Spoonacular recipes.",
+                                        imageUrl = summary.image,
+                                        calories = nutrition.calories,
+                                        protein = nutrition.protein,
+                                        carbs = nutrition.carbs,
+                                        fat = nutrition.fat,
+                                        fiber = nutrition.fiber,
+                                        category = nutrition.category,
+                                        difficulty = nutrition.difficulty
+                                    ),
                                     isFav
                                 )
                             },
@@ -222,4 +252,59 @@ fun MainApp(
             }
         }
     }
+}
+
+private fun SpoonacularRecipeSummary.toFavoriteNutrition(): FavoriteNutrition {
+    val nutrients = nutrition?.nutrients.orEmpty()
+
+    fun nutrientAmount(vararg names: String): Double {
+        return nutrients.firstOrNull { nutrient ->
+            names.any { name -> nutrient.name.equals(name, ignoreCase = true) }
+        }?.amount ?: 0.0
+    }
+
+    val titleLower = title.lowercase()
+    val inferredCategory = when {
+        titleLower.contains("breakfast") || titleLower.contains("oats") || titleLower.contains("toast") || titleLower.contains("parfait") -> "Breakfast"
+        titleLower.contains("dessert") || titleLower.contains("cake") || titleLower.contains("cookie") || titleLower.contains("ice cream") -> "Dessert"
+        titleLower.contains("snack") || titleLower.contains("bite") || titleLower.contains("bar") -> "Snack"
+        titleLower.contains("salad") || titleLower.contains("vegetable") -> "Salad"
+        else -> "Main Course"
+    }
+    val inferredDifficulty = when {
+        titleLower.contains("salad") || titleLower.contains("toast") || titleLower.contains("parfait") -> "Easy"
+        titleLower.contains("stew") || titleLower.contains("roast") || titleLower.contains("braised") -> "Hard"
+        else -> "Medium"
+    }
+
+    val extractedCalories = nutrientAmount("Calories").toInt()
+    val extractedProtein = nutrientAmount("Protein")
+    val extractedCarbs = nutrientAmount("Carbohydrates", "Carbs")
+    val extractedFat = nutrientAmount("Fat")
+    val extractedFiber = nutrientAmount("Fiber", "Fibre")
+
+    val fallback = when {
+        titleLower.contains("salad") || titleLower.contains("vegetable") ->
+            FavoriteNutrition(260, 10.0, 30.0, 9.0, 8.0, "Salad", "Easy")
+        titleLower.contains("chicken") || titleLower.contains("salmon") || titleLower.contains("beef") ->
+            FavoriteNutrition(560, 38.0, 35.0, 22.0, 5.0, "Main Course", "Medium")
+        inferredCategory == "Breakfast" ->
+            FavoriteNutrition(350, 18.0, 42.0, 10.0, 6.0, "Breakfast", "Easy")
+        inferredCategory == "Snack" ->
+            FavoriteNutrition(220, 8.0, 24.0, 9.0, 4.0, "Snack", "Easy")
+        inferredCategory == "Dessert" ->
+            FavoriteNutrition(300, 6.0, 45.0, 12.0, 3.0, "Dessert", "Medium")
+        else ->
+            FavoriteNutrition(520, 32.0, 48.0, 18.0, 7.0, "Main Course", "Medium")
+    }
+
+    return FavoriteNutrition(
+        calories = extractedCalories.takeIf { it > 0 } ?: fallback.calories,
+        protein = extractedProtein.takeIf { it > 0.0 } ?: fallback.protein,
+        carbs = extractedCarbs.takeIf { it > 0.0 } ?: fallback.carbs,
+        fat = extractedFat.takeIf { it > 0.0 } ?: fallback.fat,
+        fiber = extractedFiber.takeIf { it > 0.0 } ?: fallback.fiber,
+        category = fallback.category,
+        difficulty = fallback.difficulty
+    )
 }

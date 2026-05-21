@@ -28,6 +28,10 @@ fun ChartsScreen(
     onOpenDrawer: () -> Unit = {},
     favorites: List<Recipe> = emptyList()
 ) {
+    val estimatedNutritionUsed = favorites.isNotEmpty() && favorites.all {
+        it.calories <= 0 && it.protein <= 0.0 && it.carbs <= 0.0 && it.fat <= 0.0
+    }
+
     // Analyze favorites data dynamically
     val favCount = favorites.size
     val totalCal = favorites.sumOf { it.calories }
@@ -82,6 +86,14 @@ fun ChartsScreen(
                     SummaryCard(Modifier.weight(1f), Icons.Default.Favorite, "$favCount", "Saved", OrangeSecondary)
                     SummaryCard(Modifier.weight(1f), Icons.Default.LocalFireDepartment, "$avgCal", "Avg kcal", GreenPrimary)
                     SummaryCard(Modifier.weight(1f), Icons.Default.Insights, "${avgProteinInt + avgCarbsInt + avgFatInt}g", "Avg total", Color(0xFF4F6BED))
+                }
+
+                if (estimatedNutritionUsed) {
+                    Text(
+                        "Some nutrition values are estimated for prototype analysis.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
                 }
 
                 // Nutrition Pie Chart (from favorites data)
