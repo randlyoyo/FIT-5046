@@ -191,8 +191,6 @@ fun AuthScreen(
 
                 GoogleSignInButton(onClick = onGoogleSignIn, enabled = !isLoading)
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = { scope.launch { snackbarHostState.showSnackbar("Biometric login coming soon") } },
-                    modifier = Modifier.fillMaxWidth()) { Text("Biometric Login") }
                 Spacer(Modifier.height(8.dp))
                 TextButton(onClick = onNavigateToForgotPassword) { Text("Forgot Password?") }
             }
