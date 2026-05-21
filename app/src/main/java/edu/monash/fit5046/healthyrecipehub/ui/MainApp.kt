@@ -255,56 +255,14 @@ fun MainApp(
 }
 
 private fun SpoonacularRecipeSummary.toFavoriteNutrition(): FavoriteNutrition {
-    val nutrients = nutrition?.nutrients.orEmpty()
-
-    fun nutrientAmount(vararg names: String): Double {
-        return nutrients.firstOrNull { nutrient ->
-            names.any { name -> nutrient.name.equals(name, ignoreCase = true) }
-        }?.amount ?: 0.0
-    }
-
-    val titleLower = title.lowercase()
     val inferredCategory = when {
-        titleLower.contains("breakfast") || titleLower.contains("oats") || titleLower.contains("toast") || titleLower.contains("parfait") -> "Breakfast"
-        titleLower.contains("dessert") || titleLower.contains("cake") || titleLower.contains("cookie") || titleLower.contains("ice cream") -> "Dessert"
-        titleLower.contains("snack") || titleLower.contains("bite") || titleLower.contains("bar") -> "Snack"
-        titleLower.contains("salad") || titleLower.contains("vegetable") -> "Salad"
+        title.contains("breakfast", ignoreCase = true) || title.contains("oats", ignoreCase = true) || title.contains("toast", ignoreCase = true) -> "Breakfast"
+        title.contains("salad", ignoreCase = true) || title.contains("vegetable", ignoreCase = true) -> "Salad"
         else -> "Main Course"
     }
     val inferredDifficulty = when {
-        titleLower.contains("salad") || titleLower.contains("toast") || titleLower.contains("parfait") -> "Easy"
-        titleLower.contains("stew") || titleLower.contains("roast") || titleLower.contains("braised") -> "Hard"
+        title.contains("salad", ignoreCase = true) || title.contains("toast", ignoreCase = true) -> "Easy"
         else -> "Medium"
     }
-
-    val extractedCalories = nutrientAmount("Calories").toInt()
-    val extractedProtein = nutrientAmount("Protein")
-    val extractedCarbs = nutrientAmount("Carbohydrates", "Carbs")
-    val extractedFat = nutrientAmount("Fat")
-    val extractedFiber = nutrientAmount("Fiber", "Fibre")
-
-    val fallback = when {
-        titleLower.contains("salad") || titleLower.contains("vegetable") ->
-            FavoriteNutrition(260, 10.0, 30.0, 9.0, 8.0, "Salad", "Easy")
-        titleLower.contains("chicken") || titleLower.contains("salmon") || titleLower.contains("beef") ->
-            FavoriteNutrition(560, 38.0, 35.0, 22.0, 5.0, "Main Course", "Medium")
-        inferredCategory == "Breakfast" ->
-            FavoriteNutrition(350, 18.0, 42.0, 10.0, 6.0, "Breakfast", "Easy")
-        inferredCategory == "Snack" ->
-            FavoriteNutrition(220, 8.0, 24.0, 9.0, 4.0, "Snack", "Easy")
-        inferredCategory == "Dessert" ->
-            FavoriteNutrition(300, 6.0, 45.0, 12.0, 3.0, "Dessert", "Medium")
-        else ->
-            FavoriteNutrition(520, 32.0, 48.0, 18.0, 7.0, "Main Course", "Medium")
-    }
-
-    return FavoriteNutrition(
-        calories = extractedCalories.takeIf { it > 0 } ?: fallback.calories,
-        protein = extractedProtein.takeIf { it > 0.0 } ?: fallback.protein,
-        carbs = extractedCarbs.takeIf { it > 0.0 } ?: fallback.carbs,
-        fat = extractedFat.takeIf { it > 0.0 } ?: fallback.fat,
-        fiber = extractedFiber.takeIf { it > 0.0 } ?: fallback.fiber,
-        category = fallback.category,
-        difficulty = fallback.difficulty
-    )
+    return FavoriteNutrition(calories = 0, protein = 0.0, carbs = 0.0, fat = 0.0, fiber = 0.0, category = inferredCategory, difficulty = inferredDifficulty)
 }

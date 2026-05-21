@@ -167,12 +167,7 @@ private fun RecipeCard(
                 Text(recipe.title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, fontSize = 13.sp),
                     maxLines = 1, overflow = TextOverflow.Ellipsis, color = Color(0xFF333333))
                 Spacer(Modifier.height(4.dp))
-                recipe.nutrition?.nutrients?.let { nuts ->
-                    val cal = nuts.find { it.name?.lowercase() == "calories" }
-                    if (cal != null) {
-                        Text("${cal.amount.toInt()} cal", style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Medium), color = GreenPrimary)
-                    }
-                }
+                Text("Spoonacular recipe", style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), color = Color.Gray)
             }
         }
     }

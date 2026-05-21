@@ -86,8 +86,7 @@ data class SpoonacularRecipeSummary(
     val id: Int,
     val title: String,
     val image: String?,
-    val imageType: String?,
-    val nutrition: SpoonacularNutritionSummary?
+    val imageType: String?
 )
 
 data class SpoonacularNutritionSummary(
