@@ -91,6 +91,7 @@ fun AddRecipeScreen(
         )
 
         recipeViewModel.createRecipe(request)
+        Toast.makeText(context, "Recipe saved!", Toast.LENGTH_SHORT).show()
         onNavigateBack()
     }
 
