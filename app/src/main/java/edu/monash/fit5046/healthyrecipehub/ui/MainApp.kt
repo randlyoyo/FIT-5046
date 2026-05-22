@@ -26,9 +26,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import edu.monash.fit5046.healthyrecipehub.data.model.Recipe
-import edu.monash.fit5046.healthyrecipehub.data.model.Status
+import edu.monash.fit5046.healthyrecipehub.data.remote.api.MealDto
 import edu.monash.fit5046.healthyrecipehub.data.repository.AuthState
-import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularRecipeSummary
 import edu.monash.fit5046.healthyrecipehub.ui.auth.AuthActivity
 import edu.monash.fit5046.healthyrecipehub.ui.components.BottomNavBar
 import edu.monash.fit5046.healthyrecipehub.ui.components.DrawerContent
@@ -47,16 +46,6 @@ import edu.monash.fit5046.healthyrecipehub.ui.theme.HealthyRecipeHubTheme
 import edu.monash.fit5046.healthyrecipehub.ui.viewmodel.AuthViewModel
 import edu.monash.fit5046.healthyrecipehub.ui.viewmodel.RecipeViewModel
 import kotlinx.coroutines.launch
-
-private data class FavoriteNutrition(
-    val calories: Int,
-    val protein: Double,
-    val carbs: Double,
-    val fat: Double,
-    val fiber: Double,
-    val category: String,
-    val difficulty: String
-)
 
 @Composable
 fun MainApp(
@@ -102,16 +91,11 @@ fun MainApp(
                     onNavigate = { route ->
                         when (route) {
                             "logout" -> authViewModel.logout()
-                            else -> navController.navigate(route) {
-                                popUpTo(Screen.Home.route) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            else -> navController.navigate(route) { launchSingleTop = true; restoreState = true }
                         }
                     },
                     onCloseDrawer = { scope.launch { drawerState.close() } },
-                    userName = userName,
-                    userEmail = userEmail,
+                    userName = userName, userEmail = userEmail,
                     isAdmin = authViewModel.isAdmin()
                 )
             },
@@ -143,42 +127,22 @@ fun MainApp(
                         HomeScreen(
                             onNavigate = { navController.navigate(it) { launchSingleTop = true; restoreState = true } },
                             onOpenDrawer = { scope.launch { drawerState.open() } },
-                            userName = userName,
-                            dailyPick = pick?.data
+                            userName = userName, dailyPick = pick?.data
                         )
                     }
 
-                    // Recipes (Spoonacular)
+                    // Recipes (TheMealDB - free, no API key needed)
                     composable(Screen.Recipes.route) {
-                        val recipesResource by recipeViewModel.recipes.observeAsState()
+                        val recipesResource by recipeViewModel.mealDbRecipes.observeAsState()
                         val favResource by recipeViewModel.favorites.observeAsState()
-                        val favoriteIds = remember(favResource) {
-                            favResource?.data?.map { it.id }?.toSet() ?: emptySet()
-                        }
+                        val favoriteIds = remember(favResource) { favResource?.data?.map { it.id }?.toSet() ?: emptySet() }
                         RecipesScreen(
                             onNavigate = { navController.navigate(it) { launchSingleTop = true; restoreState = true } },
                             onOpenDrawer = { scope.launch { drawerState.open() } },
-                            recipes = recipesResource?.data.orEmpty(),
-                            isLoading = recipesResource?.status == Status.LOADING,
-                            infoMessage = recipesResource?.message,
-                            isUsingFallbackData = recipesResource?.status == Status.ERROR && !recipesResource?.data.isNullOrEmpty(),
-                            onRetry = { recipeViewModel.loadRecipes() },
-                            onToggleFavorite = { summary, isFav ->
-                                val nutrition = summary.toFavoriteNutrition()
+                            recipes = recipesResource?.data ?: emptyList(),
+                            onToggleFavorite = { meal, isFav ->
                                 recipeViewModel.toggleFavorite(
-                                    Recipe(
-                                        id = summary.id.toString(),
-                                        title = summary.title,
-                                        description = "Saved from Spoonacular recipes.",
-                                        imageUrl = summary.image,
-                                        calories = nutrition.calories,
-                                        protein = nutrition.protein,
-                                        carbs = nutrition.carbs,
-                                        fat = nutrition.fat,
-                                        fiber = nutrition.fiber,
-                                        category = nutrition.category,
-                                        difficulty = nutrition.difficulty
-                                    ),
+                                    Recipe(id = meal.idMeal, title = meal.strMeal, description = meal.strCategory ?: "", imageUrl = meal.strMealThumb),
                                     isFav
                                 )
                             },
@@ -192,22 +156,15 @@ fun MainApp(
                         arguments = listOf(navArgument("recipeId") { type = NavType.StringType })
                     ) {
                         val recipeId = navController.currentBackStackEntry?.arguments?.getString("recipeId") ?: ""
-                        RecipeDetailScreen(
-                            recipeId = recipeId,
-                            onNavigateBack = { navController.navigateUp() },
+                        RecipeDetailScreen(recipeId = recipeId, onNavigateBack = { navController.navigateUp() },
                             onOpenDrawer = { scope.launch { drawerState.open() } },
-                            recipeViewModel = recipeViewModel,
-                            authViewModel = authViewModel
-                        )
+                            recipeViewModel = recipeViewModel, authViewModel = authViewModel)
                     }
 
                     // Add Recipe
                     composable(Screen.AddRecipe.route) {
-                        AddRecipeScreen(
-                            onNavigateBack = { navController.navigateUp() },
-                            onOpenDrawer = { scope.launch { drawerState.open() } },
-                            recipeViewModel = recipeViewModel
-                        )
+                        AddRecipeScreen(onNavigateBack = { navController.navigateUp() },
+                            onOpenDrawer = { scope.launch { drawerState.open() } }, recipeViewModel = recipeViewModel)
                     }
 
                     // Favorites
@@ -218,9 +175,7 @@ fun MainApp(
                             onNavigate = { navController.navigate(it) { launchSingleTop = true; restoreState = true } },
                             onOpenDrawer = { scope.launch { drawerState.open() } },
                             favorites = favResource?.data ?: emptyList(),
-                            onRecipeClick = { recipe ->
-                                navController.navigate(Screen.RecipeDetail.createRoute(recipe.id))
-                            }
+                            onRecipeClick = { recipe -> navController.navigate(Screen.RecipeDetail.createRoute(recipe.id)) }
                         )
                     }
 
@@ -241,28 +196,11 @@ fun MainApp(
                     composable(Screen.AIAssistant.route) { AIAssistantScreen(onNavigateBack = { navController.navigateUp() }, onOpenDrawer = { scope.launch { drawerState.open() } }) }
                     composable(Screen.Charts.route) {
                         val favResource by recipeViewModel.favorites.observeAsState()
-                        ChartsScreen(
-                            onNavigateBack = { navController.navigateUp() },
-                            onOpenDrawer = { scope.launch { drawerState.open() } },
-                            favorites = favResource?.data ?: emptyList()
-                        )
+                        ChartsScreen(onNavigateBack = { navController.navigateUp() }, onOpenDrawer = { scope.launch { drawerState.open() } }, favorites = favResource?.data ?: emptyList())
                     }
                     composable(Screen.Settings.route) { SettingsScreen(onNavigateBack = { navController.navigateUp() }, onOpenDrawer = { scope.launch { drawerState.open() } }) }
                 }
             }
         }
     }
-}
-
-private fun SpoonacularRecipeSummary.toFavoriteNutrition(): FavoriteNutrition {
-    val inferredCategory = when {
-        title.contains("breakfast", ignoreCase = true) || title.contains("oats", ignoreCase = true) || title.contains("toast", ignoreCase = true) -> "Breakfast"
-        title.contains("salad", ignoreCase = true) || title.contains("vegetable", ignoreCase = true) -> "Salad"
-        else -> "Main Course"
-    }
-    val inferredDifficulty = when {
-        title.contains("salad", ignoreCase = true) || title.contains("toast", ignoreCase = true) -> "Easy"
-        else -> "Medium"
-    }
-    return FavoriteNutrition(calories = 0, protein = 0.0, carbs = 0.0, fat = 0.0, fiber = 0.0, category = inferredCategory, difficulty = inferredDifficulty)
 }

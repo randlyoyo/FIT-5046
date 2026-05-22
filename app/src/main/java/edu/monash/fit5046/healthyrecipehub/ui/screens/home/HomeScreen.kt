@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import edu.monash.fit5046.healthyrecipehub.context.HealthContextManager
-import edu.monash.fit5046.healthyrecipehub.data.remote.api.SpoonacularRecipeSummary
+import edu.monash.fit5046.healthyrecipehub.data.remote.api.MealDto
 import edu.monash.fit5046.healthyrecipehub.ui.navigation.Screen
 import edu.monash.fit5046.healthyrecipehub.ui.theme.GreenPrimary
 import edu.monash.fit5046.healthyrecipehub.ui.theme.OrangeSecondary
@@ -36,15 +36,15 @@ fun HomeScreen(
     onNavigate: (String) -> Unit,
     onOpenDrawer: () -> Unit = {},
     userName: String = "User",
-    dailyPick: SpoonacularRecipeSummary? = null
+    dailyPick: MealDto? = null
 ) {
     val contextManager = remember { HealthContextManager() }
     val contextSummary = remember { contextManager.getContextSummary() }
 
     // Real recipe from Spoonacular as daily pick
-    val pickId = dailyPick?.id?.toString() ?: ""
-    val pickTitle = dailyPick?.title ?: "Healthy Mixed Salad"
-    val pickImage = dailyPick?.image ?: "https://picsum.photos/seed/food/800/400"
+    val pickId = dailyPick?.idMeal ?: ""
+    val pickTitle = dailyPick?.strMeal ?: "Healthy Mixed Salad"
+    val pickImage = dailyPick?.strMealThumb ?: "https://picsum.photos/seed/food/800/400"
 
     var aiSuggestion by remember { mutableStateOf("") }
     val aiSuggestions = remember {
